@@ -222,6 +222,11 @@ uint16_t delaySecondsCount[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };		//delay saniye sayici
 
+uint16_t delaySecondsCountForOff[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };		//alarmi sondurmek icin delay saniye sayici
+
 uint16_t alarmOn[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -776,6 +781,7 @@ int main(void)
 									&& (fadeOut[k] == 0)) // qoyulan vaxda catdisa
 									{
 								alarmOn[k] = 1;                  //alarmi yandir
+								delaySecondsCountForOff[k] = 5; //alarmi sonudrmek ucun olan sayicini 5 ele
 								sendData(digitalInputId[k]);				//
 								/*
 								 for(int jj=0;jj<10;jj++)
@@ -819,7 +825,9 @@ int main(void)
 						//delay;
 					}
 				} else { 	//sifirla eger signal gelmeyibse hec
-					alarmOn[k] = 0;
+					if (delaySecondsCountForOff[k] == 0){
+						alarmOn[k] = 0;
+					}
 					alarmCount[k] = 0;
 					waitingForDelay[k] = 0;
 					delaySecondsCount[k] = 0;
@@ -1456,6 +1464,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			}
 		}
 		//HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_13);
+
+		for (int h = 0; h < 77; h++){
+			if (delaySecondsCountForOff[h] > 0){
+				delaySecondsCountForOff[h] -= 1;
+			}
+		}
 	}
 }
 
