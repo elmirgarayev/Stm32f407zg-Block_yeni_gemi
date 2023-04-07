@@ -135,7 +135,7 @@ void check_channels(int sel) {
 		sum = sum + HAL_ADC_GetValue(&hadc3);
 	}
 	average = sum / (sampleRate);
-	message[j] = average;
+	message[sel] = average;
 	sum = 0;
 	average = 0;
 	HAL_ADC_Stop(&hadc3);
@@ -146,15 +146,15 @@ void check_channels(int sel) {
 		sum = sum + HAL_ADC_GetValue(&hadc2);
 	}
 	average = sum / (sampleRate);
-	message[j + 16] = average;
+	message[sel + 16] = average;
 	sum = 0;
 	average = 0;
 	HAL_ADC_Stop(&hadc2);
 
 	int tam = 0, qaliq = 0;
 
-	tam = j / 4;
-	qaliq = j % 4;
+	tam = sel / 4;
+	qaliq = sel % 4;
 
 	digitalStates[48 + (3 + tam * 4 - qaliq)] = (HAL_GPIO_ReadPin(GPIOA,
 	GPIO_PIN_6)); // Dig5.1-5.16 Dig37-52
@@ -674,16 +674,16 @@ int main(void)
 		 seconds =gTime.Seconds;
 		 */
 ////////////////////////////////////////////////mux u saydir adc ve dig deyerlri yolla/////////////////////////////////////////////////////
-		for (j = 0; j < 16; ++j) {
+		for (int t = 0; t < 16; ++t) {
 			mux(15 - j);
 			HAL_Delay(1);
 			check_channels(j);
 		}
 
-		for (j = 0; j < 26; j++) {
-			if ((j != 0) && (j != 2) && (j != 4) && (j != 6) && (j != 8)
-					&& (j != 10)) {
-				analog[m] = message[j]; ////lazimsiz bos mesajlari atmaq
+		for (int t = 0; t < 26; t++) {
+			if ((t != 0) && (t != 2) && (t != 4) && (t != 6) && (t != 8)
+					&& (t != 10)) {
+				analog[m] = message[t]; ////lazimsiz bos mesajlari atmaq
 				m++;
 			}
 		}
@@ -908,8 +908,8 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		for (int i = 0; i < 10; i++) {
-			for (j = 0; j < 2; j++) {
-				i2_j = i * 2 + j;
+			for (int t = 0; t < 2; t++) {
+				i2_j = i * 2 + t;
 				/*
 				 voltValIncorrect[i*2+j] = (((float)analog[i*2+j])*3.3)/4096.0;    //voltaj deyeri xetali olan
 				 if((voltValIncorrect[i*2+j] <= 1.6))
@@ -929,110 +929,110 @@ int main(void)
 				 }
 				 */
 
-				voltVal[i * 2 + j] = (((float) analog[i * 2 + j]) * 3.3)
+				voltVal[i * 2 + t] = (((float) analog[i * 2 + t]) * 3.3)
 						/ 4096.0;
 
-				//realVal[i*2+j] = ((voltVal[i*2+j] - analogConfigs[i*2+j].minVolt )/(analogConfigs[i*2+j].maxVolt-analogConfigs[i*2+j].minVolt))*(analogConfigs[i*2+j].maxRealVal - analogConfigs[i*2+j].minRealVal)+analogConfigs[i*2+j].minVolt;   //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin // mence burda sef gedib ustune gelinen sondaki minRealVal olmali idi burda min real val istifade etmemisik deye aştdaki formup problemsiz isletyir
-				realVal[i * 2 + j] = ((voltVal[i * 2 + j]
-						- analogConfigs[i * 2 + j].minVolt)
-						/ (analogConfigs[i * 2 + j].maxVolt
-								- analogConfigs[i * 2 + j].minVolt))
-						* (analogConfigs[i * 2 + j].maxRealVal
-								- analogConfigs[i * 2 + j].minRealVal); //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin
-				intPart[i * 2 + j] = (uint16_t) realVal[i * 2 + j];
-				fractionPart[i * 2 + j] = (uint8_t) ((realVal[i * 2 + j]
-						- intPart[i * 2 + j]) * 100);
+				//realVal[i*2+t] = ((voltVal[i*2+t] - analogConfigs[i*2+t].minVolt )/(analogConfigs[i*2+t].maxVolt-analogConfigs[i*2+t].minVolt))*(analogConfigs[i*2+t].maxRealVal - analogConfigs[i*2+t].minRealVal)+analogConfigs[i*2+t].minVolt;   //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin // mence burda sef gedib ustune gelinen sondaki minRealVal olmali idi burda min real val istifade etmemisik deye aştdaki formup problemsiz isletyir
+				realVal[i * 2 + t] = ((voltVal[i * 2 + t]
+						- analogConfigs[i * 2 + t].minVolt)
+						/ (analogConfigs[i * 2 + t].maxVolt
+								- analogConfigs[i * 2 + t].minVolt))
+						* (analogConfigs[i * 2 + t].maxRealVal
+								- analogConfigs[i * 2 + t].minRealVal); //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin
+				intPart[i * 2 + t] = (uint16_t) realVal[i * 2 + t];
+				fractionPart[i * 2 + t] = (uint8_t) ((realVal[i * 2 + t]
+						- intPart[i * 2 + t]) * 100);
 
-				if (analogConfigs[i * 2 + j].moreThen == 0) {
-					if (realVal[i * 2 + j]
-							< analogConfigs[i * 2 + j].alarmLevel) {
-						analogAlarmCountDown[i * 2 + j] = 0;
-						if (alarmOnAnalog[i * 2 + j] == 0) {
-							analogAlarmCount[i * 2 + j]++; // analog alarimin say
-							if ((analogAlarmCount[i * 2 + j] >= 10)
-									&& (analogFadeOut[i * 2 + j] == 0)) // 4 defe alarm verse analog alarimin yandir
+				if (analogConfigs[i * 2 + t].moreThen == 0) {
+					if (realVal[i * 2 + t]
+							< analogConfigs[i * 2 + t].alarmLevel) {
+						analogAlarmCountDown[i * 2 + t] = 0;
+						if (alarmOnAnalog[i * 2 + t] == 0) {
+							analogAlarmCount[i * 2 + t]++; // analog alarimin say
+							if ((analogAlarmCount[i * 2 + t] >= 10)
+									&& (analogFadeOut[i * 2 + t] == 0)) // 4 defe alarm verse analog alarimin yandir
 									{
-								alarmOnAnalog[i * 2 + j] = 1;
-								sendData(analogInputID[i * 2 + j]);
-								secondByte[i * 2 + j] |= 2; // eger alarim oldusa 1 ci biti 1 ele
+								alarmOnAnalog[i * 2 + t] = 1;
+								sendData(analogInputID[i * 2 + t]);
+								secondByte[i * 2 + t] |= 2; // eger alarim oldusa 1 ci biti 1 ele
 								stationAlarm = notResetAlarm;	//alarm cixdi
 								HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13,
 										GPIO_PIN_SET); //alarm isigin yandir
-								analogAlarmCount[i * 2 + j] = 10; //analog sayicisi 4 e catdisa 4 de saxla
+								analogAlarmCount[i * 2 + t] = 10; //analog sayicisi 4 e catdisa 4 de saxla
 							}
 						}
 
 					} else {
-						analogAlarmCountDown[i * 2 + j]++;
-						if (analogAlarmCountDown[i * 2 + j] >= 10) {
-							analogAlarmCount[i * 2 + j] = 0; //alarim deyilse sayicini sifirla
-							alarmOnAnalog[i * 2 + j] = 0;
-							analogAlarmCountDown[i * 2 + j] = 10;
-							secondByte[i * 2 + j] &= ~2;
+						analogAlarmCountDown[i * 2 + t]++;
+						if (analogAlarmCountDown[i * 2 + t] >= 10) {
+							analogAlarmCount[i * 2 + t] = 0; //alarim deyilse sayicini sifirla
+							alarmOnAnalog[i * 2 + t] = 0;
+							analogAlarmCountDown[i * 2 + t] = 10;
+							secondByte[i * 2 + t] &= ~2;
 						}
 					}
-				} else if (analogConfigs[i * 2 + j].moreThen == 1) {
-					if (realVal[i * 2 + j]
-							> analogConfigs[i * 2 + j].alarmLevel) {
-						analogAlarmCountDown[i * 2 + j] = 0;
-						if (alarmOnAnalog[i * 2 + j] == 0) {
-							analogAlarmCount[i * 2 + j]++; // analog alarimin say
-							if ((analogAlarmCount[i * 2 + j] >= 10)
-									&& (analogFadeOut[i * 2 + j] == 0)) // 4 defe alarm verse analog alarimin yandir
+				} else if (analogConfigs[i * 2 + t].moreThen == 1) {
+					if (realVal[i * 2 + t]
+							> analogConfigs[i * 2 + t].alarmLevel) {
+						analogAlarmCountDown[i * 2 + t] = 0;
+						if (alarmOnAnalog[i * 2 + t] == 0) {
+							analogAlarmCount[i * 2 + t]++; // analog alarimin say
+							if ((analogAlarmCount[i * 2 + t] >= 10)
+									&& (analogFadeOut[i * 2 + t] == 0)) // 4 defe alarm verse analog alarimin yandir
 									{
-								secondByte[i * 2 + j] |= 2; // eger alarim oldusa 1 ci biti 1 ele
-								alarmOnAnalog[i * 2 + j] = 1;
-								sendData(analogInputID[i * 2 + j]);
+								secondByte[i * 2 + t] |= 2; // eger alarim oldusa 1 ci biti 1 ele
+								alarmOnAnalog[i * 2 + t] = 1;
+								sendData(analogInputID[i * 2 + t]);
 								stationAlarm = notResetAlarm;	//alarm cixdi
 								HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13,
 										GPIO_PIN_SET); //alarm isigin yandir
-								analogAlarmCount[i * 2 + j] = 10; //analog sayicisi 4 e catdisa 4 de saxla
+								analogAlarmCount[i * 2 + t] = 10; //analog sayicisi 4 e catdisa 4 de saxla
 							}
 						}
 					} else {
-						analogAlarmCountDown[i * 2 + j]++;
-						if (analogAlarmCountDown[i * 2 + j] >= 10) {
-							alarmOnAnalog[i * 2 + j] = 0;
-							analogAlarmCountDown[i * 2 + j] = 10;
-							analogAlarmCount[i * 2 + j] = 0; //alarim deyilse sayicini sifirla
-							secondByte[i * 2 + j] &= ~2;
+						analogAlarmCountDown[i * 2 + t]++;
+						if (analogAlarmCountDown[i * 2 + t] >= 10) {
+							alarmOnAnalog[i * 2 + t] = 0;
+							analogAlarmCountDown[i * 2 + t] = 10;
+							analogAlarmCount[i * 2 + t] = 0; //alarim deyilse sayicini sifirla
+							secondByte[i * 2 + t] &= ~2;
 						}
 
 					}
 				}
 
 				/*
-				 if(realVal[i*2+j] > analogConfigs[i*2+j].warningLevel)   //worning levele geldise
+				 if(realVal[i*2+t] > analogConfigs[i*2+t].warningLevel)   //worning levele geldise
 				 {
 				 secondByte |=1;  // 0 ci biti 1 ele
 				 }
 				 */
 
-				if (analogFadeOut[i * 2 + j] == 1)  //fade out dusa
+				if (analogFadeOut[i * 2 + t] == 1)  //fade out dusa
 						{
-					secondByte[i * 2 + j] |= 4;
+					secondByte[i * 2 + t] |= 4;
 				} else {
-					secondByte[i * 2 + j] &= ~4;
+					secondByte[i * 2 + t] &= ~4;
 				}
 
-				if (analogSignalFoult[i * 2 + j] == 1)  //signal foult dusa
+				if (analogSignalFoult[i * 2 + t] == 1)  //signal foult dusa
 						{
-					secondByte[i * 2 + j] |= 8;
+					secondByte[i * 2 + t] |= 8;
 				} else {
-					secondByte[i * 2 + j] &= ~8;
+					secondByte[i * 2 + t] &= ~8;
 				}
 
-				secondWord[i * 2 + j] = (uint16_t) secondByte[i * 2 + j]
-						+ ((uint16_t) fractionPart[i * 2 + j]) * 256;
+				secondWord[i * 2 + t] = (uint16_t) secondByte[i * 2 + t]
+						+ ((uint16_t) fractionPart[i * 2 + t]) * 256;
 
-				TxData[i][j * 2] = intPart[i * 2 + j];
-				TxData[i][j * 2 + 1] = secondWord[i * 2 + j];
+				TxData[i][t * 2] = intPart[i * 2 + t];
+				TxData[i][t * 2 + 1] = secondWord[i * 2 + t];
 
 				if (i2_j == 2) {
 					i2_j = 2;
 				}
 
-				//secondByte[i*2+j] = 0;
+				//secondByte[i*2+t] = 0;
 			}
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
