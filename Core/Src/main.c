@@ -109,7 +109,7 @@ enum alarm_state {
 	resetAlarm, notResetAlarm
 };
 
-int j = 0, m = 0, u = 0, p = 0;
+int m = 0, u = 0, p = 0;
 int say = 0;
 
 ////////////////////mux u saydir/////////////////////////////////////////////////////////////////////////////////
@@ -513,7 +513,7 @@ int main(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 // 14 dene header olacaq
 
-	for (j = 0; j < 22; j++) {
+	for (int j = 0; j < 22; j++) {
 		TxHeader[j].DLC = 8;
 		TxHeader[j].IDE = CAN_ID_STD;
 		TxHeader[j].RTR = CAN_RTR_DATA;
@@ -675,9 +675,9 @@ int main(void)
 		 */
 ////////////////////////////////////////////////mux u saydir adc ve dig deyerlri yolla/////////////////////////////////////////////////////
 		for (int t = 0; t < 16; ++t) {
-			mux(15 - j);
+			mux(15 - t);
 			HAL_Delay(1);
-			check_channels(j);
+			check_channels(t);
 		}
 
 		for (int t = 0; t < 26; t++) {
