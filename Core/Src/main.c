@@ -22,8 +22,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include <math.h>
 #include "EEPROM.h"
 /* USER CODE END Includes */
 
@@ -802,6 +800,7 @@ int main(void)
 								if ((delaySeconds[k] == 0) && (fadeOut[k] == 0))//saniye sayan 0 disa gir
 										{
 									alarmOn[k] = 1;				//alari yandir
+									delaySecondsCountForOff[k] = 5; //alarmi sonudrmek ucun olan sayicini 5 ele
 									sendData(digitalInputId[k]);
 									/*
 									 for(int jj=0;jj<10;jj++)
@@ -1455,11 +1454,11 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim6) {
 		//
-		for (int h = 0; h < 16; h++) {
+		for (int h = 0; h < 77; h++) {
 			if (waitingForDelay[h] == 1) {
 				delaySecondsCount[h]++;
 				if (delaySecondsCount[h] >= 50) {
-					//delaySecondsCount[h] = 50;
+					delaySecondsCount[h] = 50;
 				}
 			}
 		}
