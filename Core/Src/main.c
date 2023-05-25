@@ -786,7 +786,7 @@ int main(void)
 								 {
 								 TxData[14][0]=digitalInputId[k];  ////giris nomresi
 								 HAL_CAN_AddTxMessage(&hcan1, &TxHeader[14], TxData[14], &TxMailbox);
-								 HAL_Delay(100);
+								 HAL_Delay(20);
 								 }*/
 								stationAlarm = notResetAlarm;//alarimi yandir signal cixdi deye
 								HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13,
@@ -807,7 +807,7 @@ int main(void)
 									 {
 									 TxData[14][0]=digitalInputId[k];  ////giris nomresi
 									 HAL_CAN_AddTxMessage(&hcan1, &TxHeader[14], TxData[14], &TxMailbox);
-									 HAL_Delay(100);
+									 HAL_Delay(20);
 									 }
 									 */
 									stationAlarm = notResetAlarm;//alarimi yandir signal cixdi deye
@@ -864,14 +864,14 @@ int main(void)
 			for (int hh = 0; hh < 10; hh++) {
 				HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16],
 						&TxMailbox);
-				HAL_Delay(1);
+				HAL_Delay(20);
 			}
 		} else {
 			TxData[16][1] = 0;
 		}
 
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16], &TxMailbox);
-		HAL_Delay(1);
+		HAL_Delay(20);
 
 		TxData[11][0] = digitalSum[0];
 		TxData[11][1] = digitalSum[1];
@@ -887,11 +887,11 @@ int main(void)
 		TxData[13][3] = 0;
 
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[11], TxData[11], &TxMailbox);
-		HAL_Delay(1);
+		HAL_Delay(20);
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[12], TxData[12], &TxMailbox);
-		HAL_Delay(1);
+		HAL_Delay(20);
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[13], TxData[13], &TxMailbox);
-		HAL_Delay(1);
+		HAL_Delay(20);
 
 		digitalSum[0] = 0;
 		digitalSum[1] = 0;
@@ -1035,7 +1035,7 @@ int main(void)
 			}
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
-			HAL_Delay(1);
+			HAL_Delay(20);
 
 		}
 
@@ -1046,7 +1046,7 @@ int main(void)
 		 TxData[16][3] = digitalSum;
 		 */
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[12], TxData[12], &TxMailbox);
-		HAL_Delay(1);
+		HAL_Delay(20);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1479,7 +1479,7 @@ void sendData(int inputId)						//
 	TxData[14][2] = 1;  /////////stansiya nomresi
 	TxData[14][3] = 1065;
 	HAL_CAN_AddTxMessage(&hcan1, &TxHeader[14], TxData[14], &TxMailbox);
-	HAL_Delay(1);
+	HAL_Delay(20);
 }
 
 /* USER CODE END 4 */
