@@ -89,7 +89,6 @@ static void MX_TIM6_Init(void);
 
 #define DEV_ADDR 0xa0
 
-//int dataw3 = 40;
 uint32_t dataw3 = 41;
 int datar3;
 int i2_j = 0;
@@ -262,7 +261,7 @@ uint16_t stationAlarm = 0;
 
 uint8_t recivedReset = 0;
 
-//uint16_t digital[16]=0;
+
 
 uint16_t digitalSum[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -295,7 +294,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 
 	if (RxHeader.StdId == 0x500) {
 		recivedReset = 1;
-		//HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13, GPIO_PIN_RESET);
 	}
 
 	if (RxHeader.StdId == 0x600) {
@@ -414,15 +412,9 @@ int main(void)
 	}
 
 	//Start Timer
-
 	HAL_TIM_Base_Start_IT(&htim6);
 
-	/*
-	 if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1) != 0x32F2)
-	 {
-	 set_time();
-	 }
-	 */
+
 	EEPROM_Write_NUM(0, 0, dataw3);
 	datar3 = EEPROM_Read_NUM(0, 0);
 
@@ -845,8 +837,6 @@ int main(void)
 				if (i2_j == 2) {
 					i2_j = 2;
 				}
-
-				//secondByte[i*2+t] = 0;
 			}
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
