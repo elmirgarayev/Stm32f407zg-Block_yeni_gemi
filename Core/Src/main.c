@@ -93,11 +93,6 @@ uint32_t dataw3 = 41;
 int datar3;
 int i2_j = 0;
 
-uint32_t testArrWrite[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16 };
-uint32_t testArrWrite1[16] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110,
-		120, 130, 140, 150, 160 };
-int testArrRead[16];
 
 uint16_t message[62];
 uint16_t analog[62];
@@ -106,7 +101,7 @@ enum alarm_state {
 	resetAlarm, notResetAlarm
 };
 
-int m = 0, u = 0, p = 0;
+int tamHisse = 0, kesirHisse = 0;
 int say = 0;
 
 ////////////////////mux u saydir/////////////////////////////////////////////////////////////////////////////////
@@ -337,6 +332,7 @@ struct analogConfig {
 	int moreThen;
 
 //hecne baglanmayanlara 1500 limit qoy ve boyukdur deki yalanci alarm yaratmasin
+//birinci minimum, ikinci maksimum, ucuncu deyerin necen basladigi, dorduncu necede bitdiyi, bvesinci warning, altinci alarm, 7 cide onun asagi siqnalda yoxsa yuxari siqnalda vermesidi.
 } analogConfigs[25] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
 		{ 0.64, 3.3, 0, 114.296875, 40, 70, 1 },	//1006
 		{ 0.64, 3.3, 0, 114.296875, 60, 98, 1 },	//1008
@@ -500,6 +496,7 @@ int main(void)
 		analogFadeOutTotReadTest[0] = EEPROM_Read_NUM(6, 0);
 		analogFadeOutTotReadTest[1] = EEPROM_Read_NUM(7, 0);
 
+		//buarada epromdan oxunan ilkin deyerleri fade out arrayine saliriq.
 		for (int k = 0; k < 16; k++) {
 			fadeOutBaxmaq[k] = (fadeOutTotReadTest[0] >> k) & 1;
 			fadeOutBaxmaq[k + 16] = (fadeOutTotReadTest[1] >> k) & 1;
@@ -525,7 +522,7 @@ int main(void)
 			HAL_Delay(1);
 			check_channels(t);
 		}
-
+		int m=0;
 		for (int t = 0; t < 26; t++) {
 			if ((t != 0) && (t != 2) && (t != 4) && (t != 6) && (t != 8)
 					&& (t != 10)) {
@@ -664,13 +661,13 @@ int main(void)
 					delaySecondsCount[k] = 0;
 				}
 
-				u = k / 8; // 1 id 4 word yollayir onagore her word ucun boluruk
-				p = k % 8;	//sonraki wordun necencisi olduguna bundan baxiriq
+				tamHisse = k / 8; // 1 id 4 word yollayir onagore her word ucun boluruk
+				kesirHisse = k % 8;	//sonraki wordun necencisi olduguna bundan baxiriq
 
 				if (alarmOn[k] != 0) {
-					digitalSum[u] |= (1 << p * 2); //burdada necncei wordun olduguna sonra hemin wordun necencisi olduguna baxiriq
+					digitalSum[tamHisse] |= (1 << kesirHisse * 2); //burdada necncei wordun olduguna sonra hemin wordun necencisi olduguna baxiriq
 				}
-				digitalSum[u] |= (fadeOut[k] << (p * 2 + 1));
+				digitalSum[tamHisse] |= (fadeOut[k] << (kesirHisse * 2 + 1));
 			}
 
 		}
