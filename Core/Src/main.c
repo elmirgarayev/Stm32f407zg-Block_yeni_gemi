@@ -50,23 +50,7 @@ I2C_HandleTypeDef hi2c2;
 TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
-/*
- RTC_DateTypeDef gDate;
- RTC_TimeTypeDef gTime;
 
-
- char time[10];
- char date[10];
-
-
- uint8_t hours=0;
- uint8_t minutes=0;
- uint8_t seconds=0;
- uint8_t weekDay=0;
- uint8_t month=0;
- uint8_t date1=0;
- uint8_t year=0;
- */
 
 uint16_t digitalStates[80];
 
@@ -92,8 +76,9 @@ static void MX_TIM6_Init(void);
 //epromun islekliyin yoxlamq ucun
 float dataw3[2] = {1.11, 2.22};
 float datar3[2] = {0, 0};
-float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
-float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+///float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
+///float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 float alarmLevel[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 int i2_j = 0;
@@ -259,7 +244,7 @@ uint16_t analogSignalFoult[20] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 uint16_t stationAlarm = 0;
 
 uint8_t recivedReset = 0;
-
+uint8_t alarmLevelRecivedFlag=0;	//bunu qoyuramki alarmLimitLevel yollanildigin qeyd edim ve bunun qebul etdiyimle bagli mesaji geri gonderende buna esasen edim.
 
 
 uint16_t digitalSum[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -316,8 +301,28 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 
 	}
 
+
 	if (RxHeader.StdId == 0x501) {
 		pk1 = RxData[0];
+	}
+	// burda gelen alarmLimitleri qebul et yazdir
+	if (RxHeader.StdId == 0x502) {
+		alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
+		for(int k=0; k<20; k++)
+		{
+			if(analogInputID[k] == RxData[0]) //deyekki id bunun icindedi
+			{
+				if(k>=16)
+				{
+					EEPROM_Write_NUM(9, 4*k-64, RxData[1]); //alarmLevelValue RxData[1] de oldugun fikirlessek
+				}
+				else
+				{
+					EEPROM_Write_NUM(8, 4*k, RxData[1]); //alarmLevelValue RxData[1] de oldugun fikirlessek
+				}
+				alarmLevel[k]=RxData[1];
+			}
+		}
 	}
 
 	if (RxHeader.DLC == 2) {
@@ -423,6 +428,7 @@ int main(void)
 
 
 	////float alarm deyerlerin burda yazdir////
+	/*
 	for(int k = 0; k < 16; k++)
 	{
 		EEPROM_Write_NUM(8, 4*k, alarmLevelWrite[k]);
@@ -434,7 +440,7 @@ int main(void)
 			alarmLevelRead[k+16] = EEPROM_Read_NUM(9, 4*k);
 		}
 	}
-
+	*/
 
 	fadeOutTotRead[0] = EEPROM_Read_NUM(1, 0);
 	fadeOutTotRead[1] = EEPROM_Read_NUM(2, 0);
