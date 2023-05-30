@@ -92,6 +92,9 @@ static void MX_TIM6_Init(void);
 //epromun islekliyin yoxlamq ucun
 float dataw3[2] = {1.11, 2.22};
 float datar3[2] = {0, 0};
+float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
+float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float alarmLevel[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 int i2_j = 0;
 
@@ -331,35 +334,34 @@ struct analogConfig {
 	float minRealVal;
 	float maxRealVal;
 	float warningLevel;
-	float alarmLevel;
 	int moreThen;
 
 //hecne baglanmayanlara 1500 limit qoy ve boyukdur deki yalanci alarm yaratmasin
 //birinci minimum, ikinci maksimum, ucuncu deyerin necen basladigi, dorduncu necede bitdiyi, bvesinci warning, altinci alarm, 7 cide onun asagi siqnalda yoxsa yuxari siqnalda vermesidi.
 } analogConfigs[25] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
-		{ 0.64, 3.3, 0, 114.296875, 40, 70, 1 },	//1006
-		{ 0.64, 3.3, 0, 114.296875, 60, 98, 1 },	//1008
-		{ 0.64, 3.3, 0, 114.296875, 60, 80, 1 },	//1010
-		{ 0.64, 3.3, 0, 114.296875, 60, 1500, 1 },	//1012 //bosdu bu
-		{ 0.64, 3.3, 0, 114.296875, 60, 90, 1 },	//1014
-		{ 0.64, 3.3, 0, 114.296875, 40, 85, 1 },	//1016
-		{ 0.64, 3.2, 0, 4, 60, 0.3, 0 },  			//1017
-		{ 0.64, 3.2, 0, 10, 60, 2, 0 },				//1018
-		{ 0.64, 3.2, 0, 7, 3, 1500, 1 },			//1019//bos
-		{ 0.64, 3.2, 0, 7, 3, 1500, 1 },			//1020//bos
-		{ 0.64, 3.2, 0, 1000, 1000, 1300, 1 },		//1021
-		{ 0.64, 3.2, 0, 6, 60, 0.5, 0 },			//1022
-		{ 0.64, 3.2, 0, 4, 60, 0.1, 0 },			//1023
-		{ 0.64, 3.2, 0, 1.5, 60, 1500, 1 },			//1024//bos
-		{ 0.64, 3.2, 0, 15, 60, 1500, 1 },			//1025//bos
-		{ 0.64, 3.2, 0, 6, 40, 0.7, 0 },			//1026
-		{ 0.64, 3.2, 0, 10, 60, 3, 0 },				//1027
-		{ 0.64, 3.2, 0, 4, 60, 0.6, 0 },			//1028
-		{ 0.64, 3.2, 0, 10, 60, 1, 0 },				//1029
-		{ 0.64, 3.2, 0, 600, 60, 490, 1 },			//1030
-		{ 0.64, 3.2, 0, 1000, 40, 50, 0 }, { 0.64, 3.2, 0, 1000, 60, 70, 0 }, {
-				0.64, 3.2, 0, 1000, 60, 70, 0 },
-		{ 0.64, 3.2, 0, 1000, 60, 70, 0 }, { 0.64, 3.2, 0, 1000, 60, 70, 0 } };
+		{ 0.64, 3.3, 0, 114.296875, 40, 1 },	//1006
+		{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1008
+		{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1010
+		{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1012 //bosdu bu
+		{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1014
+		{ 0.64, 3.3, 0, 114.296875, 40, 1 },	//1016
+		{ 0.64, 3.2, 0, 4, 60, 0 },  			//1017
+		{ 0.64, 3.2, 0, 10, 60, 0 },			//1018
+		{ 0.64, 3.2, 0, 7, 3, 1 },				//1019//bos
+		{ 0.64, 3.2, 0, 7, 3, 1 },				//1020//bos
+		{ 0.64, 3.2, 0, 1000, 1000, 1 },		//1021
+		{ 0.64, 3.2, 0, 6, 60, 0 },				//1022
+		{ 0.64, 3.2, 0, 4, 60, 0 },				//1023
+		{ 0.64, 3.2, 0, 1.5, 60, 1 },			//1024//bos
+		{ 0.64, 3.2, 0, 15, 60, 1 },			//1025//bos
+		{ 0.64, 3.2, 0, 6, 40, 0 },				//1026
+		{ 0.64, 3.2, 0, 10, 60, 0 },			//1027
+		{ 0.64, 3.2, 0, 4, 60, 0 },				//1028
+		{ 0.64, 3.2, 0, 10, 60, 0 },			//1029
+		{ 0.64, 3.2, 0, 600, 60, 1 },			//1030
+		{ 0.64, 3.2, 0, 1000, 40, 0 }, { 0.64, 3.2, 0, 1000, 60, 0 }, {
+				0.64, 3.2, 0, 1000, 60, 0 },
+		{ 0.64, 3.2, 0, 1000, 60, 0 }, { 0.64, 3.2, 0, 1000, 60, 0 } };
 
 /* USER CODE END 0 */
 
@@ -418,6 +420,21 @@ int main(void)
 	datar3[0] = EEPROM_Read_NUM(0, 0);
 	EEPROM_Write_NUM(0, 4, dataw3[1]);
 	datar3[1] = EEPROM_Read_NUM(0, 4);
+
+
+	////float alarm deyerlerin burda yazdir////
+	for(int k = 0; k < 16; k++)
+	{
+		EEPROM_Write_NUM(8, 4*k, alarmLevelWrite[k]);
+		alarmLevelRead[k] = EEPROM_Read_NUM(8, 4*k);
+
+		if(k<9)
+		{
+			EEPROM_Write_NUM(9, 4*k, alarmLevelWrite[k+16]);
+			alarmLevelRead[k+16] = EEPROM_Read_NUM(9, 4*k);
+		}
+	}
+
 
 	fadeOutTotRead[0] = EEPROM_Read_NUM(1, 0);
 	fadeOutTotRead[1] = EEPROM_Read_NUM(2, 0);
@@ -759,7 +776,7 @@ int main(void)
 
 				if (analogConfigs[i * 2 + t].moreThen == 0) {
 					if (realVal[i * 2 + t]
-							< analogConfigs[i * 2 + t].alarmLevel) {
+							< alarmLevel[i * 2 + t]) {
 						analogAlarmCountDown[i * 2 + t] = 0;
 						if (alarmOnAnalog[i * 2 + t] == 0) {
 							analogAlarmCount[i * 2 + t]++; // analog alarimin say
@@ -787,7 +804,7 @@ int main(void)
 					}
 				} else if (analogConfigs[i * 2 + t].moreThen == 1) {
 					if (realVal[i * 2 + t]
-							> analogConfigs[i * 2 + t].alarmLevel) {
+							> alarmLevel[i * 2 + t]) {
 						analogAlarmCountDown[i * 2 + t] = 0;
 						if (alarmOnAnalog[i * 2 + t] == 0) {
 							analogAlarmCount[i * 2 + t]++; // analog alarimin say
