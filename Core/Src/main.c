@@ -89,8 +89,9 @@ static void MX_TIM6_Init(void);
 
 #define DEV_ADDR 0xa0
 
-uint32_t dataw3 = 41;
-int datar3;
+//epromun islekliyin yoxlamq ucun
+float dataw3[2] = {1.11, 2.22};
+float datar3[2] = {0, 0};
 int i2_j = 0;
 
 
@@ -411,8 +412,10 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim6);
 
 
-	EEPROM_Write_NUM(0, 0, dataw3);
-	datar3 = EEPROM_Read_NUM(0, 0);
+	EEPROM_Write_NUM(0, 0, dataw3[0]);
+	datar3[0] = EEPROM_Read_NUM(0, 0);
+	EEPROM_Write_NUM(0, 4, dataw3[1]);
+	datar3[1] = EEPROM_Read_NUM(0, 4);
 
 	fadeOutTotRead[0] = EEPROM_Read_NUM(1, 0);
 	fadeOutTotRead[1] = EEPROM_Read_NUM(2, 0);
