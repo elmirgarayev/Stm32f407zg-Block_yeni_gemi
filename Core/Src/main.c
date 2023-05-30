@@ -92,8 +92,8 @@ static void MX_TIM6_Init(void);
 //epromun islekliyin yoxlamq ucun
 float dataw3[2] = {1.11, 2.22};
 float datar3[2] = {0, 0};
-int i2_j = 0;
 
+int i2_j = 0;
 
 uint16_t message[62];
 uint16_t analog[62];
@@ -322,6 +322,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 	}
 
 }
+
+//float alarmLevel[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
 
 struct analogConfig {
 	float minVolt;
