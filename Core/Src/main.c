@@ -141,9 +141,9 @@ void check_channels(int sel) {
 	GPIO_PIN_6)); // Dig5.1-5.16 Dig37-52
 }
 //////////////////////////id deyerleri////////////////////////////////////////////////////////////////////////////////////////////////
-uint16_t id[22] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107,
+uint16_t id[23] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107,
 		0x108, 0x109, 0x10A, 0x10B, 0x10C, 0x10D, 0x10E, 0x10F, 0x110, 0x111,
-		0x150, 0x151, 0x152, 0x153, 0x154, 0x155, 0x156 };
+		0x150, 0x151, 0x152, 0x153, 0x154, 0x155, 0x156, 0x160};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CAN_TxHeaderTypeDef TxHeader[25];
@@ -411,7 +411,7 @@ int main(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 // 14 dene header olacaq
 
-	for (int j = 0; j < 22; j++) {
+	for (int j = 0; j < 23; j++) {
 		TxHeader[j].DLC = 8;
 		TxHeader[j].IDE = CAN_ID_STD;
 		TxHeader[j].RTR = CAN_RTR_DATA;
@@ -426,6 +426,9 @@ int main(void)
 	datar3[0] = EEPROM_Read_NUM(0, 0);
 	EEPROM_Write_NUM(0, 4, dataw3[1]);
 	datar3[1] = EEPROM_Read_NUM(0, 4);
+
+
+
 
 
 	////float alarm deyerlerin burda yazdir////
@@ -477,7 +480,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+		// bu hissede eger alarm level deyisibse yollayirq
+		if (alarmLevelRecivedFlag == 1)
+		{
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[22], 1, &TxMailbox);
+			HAL_Delay(20);
+			alarmLevelRecivedFlag = 0;
+		}
 
 		for(int k = 0; k < 16; k++)
 		{
