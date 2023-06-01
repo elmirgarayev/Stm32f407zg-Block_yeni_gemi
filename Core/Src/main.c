@@ -427,8 +427,14 @@ int main(void)
 	EEPROM_Write_NUM(0, 4, dataw3[1]);
 	datar3[1] = EEPROM_Read_NUM(0, 4);
 
-
-
+	for(int k = 0; k > 16; k++)
+	{
+		alarmLevel[k] = EEPROM_Read_NUM(8, 4*k);
+		if(k<9)
+		{
+			alarmLevel[k+16] = EEPROM_Read_NUM(9, 4*k);
+		}
+	}
 
 
 	////float alarm deyerlerin burda yazdir////
