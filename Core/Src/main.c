@@ -76,8 +76,8 @@ static void MX_TIM6_Init(void);
 //epromun islekliyin yoxlamq ucun
 float dataw3[2] = {1.11, 2.22};
 float datar3[2] = {0, 0};
-///float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
-///float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
+float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 float alarmLevel[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -296,9 +296,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 					analogFadeOut[t] = RxData[2];
 				}
 			}
-
 		}
-
 	}
 
 
@@ -308,19 +306,22 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 	// burda gelen alarmLimitleri qebul et yazdir
 	if (RxHeader.StdId == 0x502) {
 		alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
+		recivedID = (int) (RxData[2] >> 4) + ((int) (RxData[3]) << 4); //burda id ni qebul elemek ucun 12 bit xercledik.
+		float value = 0;
+		value = ((RxData[2] & 0x0F) + RxData[1]) + (float)RxData[0]/100; //tam ve kesirli hissesin gotur hesabla reqemi al.
 		for(int k=0; k<20; k++)
 		{
-			if(analogInputID[k] == RxData[0]) //deyekki id bunun icindedi
+			if(analogInputID[k] == recivedID) //deyekki id bunun icindedi
 			{
 				if(k>=16)
 				{
-					EEPROM_Write_NUM(9, 4*k-64, RxData[1]); //alarmLevelValue RxData[1] de oldugun fikirlessek
+					EEPROM_Write_NUM(9, 4*k-64, value); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
 				}
 				else
 				{
-					EEPROM_Write_NUM(8, 4*k, RxData[1]); //alarmLevelValue RxData[1] de oldugun fikirlessek
+					EEPROM_Write_NUM(8, 4*k, value); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
 				}
-				alarmLevel[k]=RxData[1];
+				alarmLevel[k]=value;
 			}
 		}
 	}
@@ -476,6 +477,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
+		for(int k = 0; k < 16; k++)
+		{
+			alarmLevelRead[k] = EEPROM_Read_NUM(8, 4*k);
+			if(k<9)
+			{
+				alarmLevelRead[k+16] = EEPROM_Read_NUM(9, 4*k);
+			}
+		}
+
+
+
+
 
 		if (fadeOutReg == 1) {
 			fadeOutTot[0] = 0;
