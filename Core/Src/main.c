@@ -74,8 +74,10 @@ static void MX_TIM6_Init(void);
 #define DEV_ADDR 0xa0
 
 //epromun islekliyin yoxlamq ucun
-float dataw3[2] = {1.11, 2.22};
-float datar3[2] = {0, 0};
+//int dataw3[2] = {1, 2};
+//int datar3[2] = {0, 0};
+int dataw3 = 17;
+int datar3;
 float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
 float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -143,7 +145,7 @@ void check_channels(int sel) {
 //////////////////////////id deyerleri////////////////////////////////////////////////////////////////////////////////////////////////
 uint16_t id[23] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107,
 		0x108, 0x109, 0x10A, 0x10B, 0x10C, 0x10D, 0x10E, 0x10F, 0x110, 0x111,
-		0x150, 0x151, 0x152, 0x153, 0x154, 0x155, 0x156, 0x160};
+		0x150, 0x151, 0x152, 0x153, 0x601, 0x155, 0x156, 0x160};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CAN_TxHeaderTypeDef TxHeader[25];
@@ -254,13 +256,6 @@ uint8_t fractionPart[50];
 
 uint16_t secondWord[50];
 
-float hValue = 0;   // grafiki cixan hesabin rahat hesablamaq ucun
-float hValue2 = 0; //ustu 2
-float hValue3 = 0; //ustu 3
-float hValueM = 0;   // vurulmasi
-float hValue2M = 0; //2 vurulmasi
-float hValue3M = 0; //3 vurulmasi
-
 float realVal[50];
 float voltValIncorrect[50];
 float voltVal[50];
@@ -279,7 +274,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 	if (RxHeader.StdId == 0x500) {
 		recivedReset = 1;
 	}
-
+/*
 	if (RxHeader.StdId == 0x600) {
 		fadeOutReg = 1;
 
@@ -288,7 +283,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 		for (int t = 0; t < 77; t++) {
 			if (digitalInputId[t] == recivedID) {
 				fadeOut[t] = RxData[2];
-
 			}
 
 			if (t < 20) {
@@ -298,29 +292,29 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 			}
 		}
 	}
-
+*/
 
 	if (RxHeader.StdId == 0x501) {
 		pk1 = RxData[0];
 	}
 	// burda gelen alarmLimitleri qebul et yazdir
-	if (RxHeader.StdId == 0x502) {
+	if (RxHeader.StdId == 0x600) {
 		alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
-		recivedID = (int) (RxData[2] >> 4) + ((int) (RxData[3]) << 4); //burda id ni qebul elemek ucun 12 bit xercledik.
+		recivedID = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
 		float value = 0;
-		value = ((RxData[2] & 0x0F) + RxData[1]) + (float)RxData[0]/100; //tam ve kesirli hissesin gotur hesabla reqemi al.
-		for(int k=0; k<20; k++)
+		TxData[22][0] = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
+		for (int k = 0; k < 77; k++) {
+			if (digitalInputId[k] == recivedID) {
+				fadeOut[k] = RxData[2];
+			}
+		}
+
+		for(int k=0; k<22; k++)
 		{
 			if(analogInputID[k] == recivedID) //deyekki id bunun icindedi
 			{
-				if(k>=16)
-				{
-					EEPROM_Write_NUM(9, 4*k-64, value); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
-				}
-				else
-				{
-					EEPROM_Write_NUM(8, 4*k, value); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
-				}
+				value = (int)RxData[3] + ((int)RxData[4] << 8) + ((float)RxData[5])/100;
+				analogFadeOut[k] = RxData[2];
 				alarmLevel[k]=value;
 			}
 		}
@@ -365,9 +359,11 @@ struct analogConfig {
 		{ 0.64, 3.2, 0, 4, 60, 0 },				//1028
 		{ 0.64, 3.2, 0, 10, 60, 0 },			//1029
 		{ 0.64, 3.2, 0, 600, 60, 1 },			//1030
-		{ 0.64, 3.2, 0, 1000, 40, 0 }, { 0.64, 3.2, 0, 1000, 60, 0 }, {
-				0.64, 3.2, 0, 1000, 60, 0 },
-		{ 0.64, 3.2, 0, 1000, 60, 0 }, { 0.64, 3.2, 0, 1000, 60, 0 } };
+		{ 0.64, 3.2, 0, 1000, 40, 0 },
+		{ 0.64, 3.2, 0, 1000, 60, 0 },
+		{ 0.64, 3.2, 0, 1000, 60, 0 },
+		{ 0.64, 3.2, 0, 1000, 60, 0 },
+		{ 0.64, 3.2, 0, 1000, 60, 0 } };
 
 /* USER CODE END 0 */
 
@@ -422,11 +418,8 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim6);
 
 
-	EEPROM_Write_NUM(0, 0, dataw3[0]);
-	datar3[0] = EEPROM_Read_NUM(0, 0);
-	EEPROM_Write_NUM(0, 4, dataw3[1]);
-	datar3[1] = EEPROM_Read_NUM(0, 4);
 
+/*
 	for(int k = 0; k > 16; k++)
 	{
 		alarmLevel[k] = EEPROM_Read_NUM(8, 4*k);
@@ -435,7 +428,7 @@ int main(void)
 			alarmLevel[k+16] = EEPROM_Read_NUM(9, 4*k);
 		}
 	}
-
+*/
 
 	////float alarm deyerlerin burda yazdir////
 	/*
@@ -451,6 +444,8 @@ int main(void)
 		}
 	}
 	*/
+
+
 
 	fadeOutTotRead[0] = EEPROM_Read_NUM(1, 0);
 	fadeOutTotRead[1] = EEPROM_Read_NUM(2, 0);
@@ -486,14 +481,36 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
+		EEPROM_Write_NUM(0, 0, dataw3);
+		datar3 = EEPROM_Read_NUM(0, 0);
+		//EEPROM_Write_NUM(0, 4, dataw3[1]);
+		//datar3[1] = EEPROM_Read_NUM(0, 4);
+
+
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1)
 		{
-			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[22], 1, &TxMailbox);
+			for(int k=0;k<22;k++)
+			{
+				if(k>=16)
+				{
+					EEPROM_Write_NUM(9, 4*k-64, alarmLevel[k]); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
+					alarmLevelRead[k] = EEPROM_Read_NUM(9, 4*k-64);
+				}
+				else
+				{
+					EEPROM_Write_NUM(8, 4*k, alarmLevel[k]); //alarmLevelValue RxData[2] de RxData[3] un konbinasiyasi olacaq
+					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4*k);
+				}
+			}
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[22], TxData[22], &TxMailbox);
 			HAL_Delay(20);
 			alarmLevelRecivedFlag = 0;
 		}
 
+		// bu hissede teze islemeye baslayib deye epromda deyerleri goturur.
 		for(int k = 0; k < 16; k++)
 		{
 			alarmLevelRead[k] = EEPROM_Read_NUM(8, 4*k);
