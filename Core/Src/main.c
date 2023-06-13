@@ -240,8 +240,6 @@ uint16_t analogFadeOutTot[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
 uint16_t analogFadeOutTotReadTest[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
 uint16_t analogFadeOutTotRead[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
 
-uint16_t analogSignalFoult[20] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0 }; // analog signal foult tutucu
 
 uint16_t stationAlarm = 0;
 
@@ -299,6 +297,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 	}
 	// burda gelen alarmLimitleri qebul et yazdir
 	if (RxHeader.StdId == 0x600) {
+		fadeOutReg = 1;
 		alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
 		recivedID = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
 		float value = 0;
@@ -838,7 +837,7 @@ int main(void)
 									{
 								alarmOnAnalog[i * 2 + t] = 1;
 								sendData(analogInputID[i * 2 + t]);
-								secondByte[i * 2 + t] |= 2; // eger alarim oldusa 1 ci biti 1 ele
+								secondByte[i * 2 + t] |= 1; // eger alarim oldusa 1 ci biti 1 ele
 								stationAlarm = notResetAlarm;	//alarm cixdi
 								HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13,
 										GPIO_PIN_SET); //alarm isigin yandir
@@ -852,7 +851,7 @@ int main(void)
 							analogAlarmCount[i * 2 + t] = 0; //alarim deyilse sayicini sifirla
 							alarmOnAnalog[i * 2 + t] = 0;
 							analogAlarmCountDown[i * 2 + t] = 10;
-							secondByte[i * 2 + t] &= ~2;
+							secondByte[i * 2 + t] &= ~1;
 						}
 					}
 				} else if (analogConfigs[i * 2 + t].moreThen == 1) {
@@ -864,7 +863,7 @@ int main(void)
 							if ((analogAlarmCount[i * 2 + t] >= 10)
 									&& (analogFadeOut[i * 2 + t] == 0)) // 4 defe alarm verse analog alarimin yandir
 									{
-								secondByte[i * 2 + t] |= 2; // eger alarim oldusa 1 ci biti 1 ele
+								secondByte[i * 2 + t] |= 1; // eger alarim oldusa 1 ci biti 1 ele
 								alarmOnAnalog[i * 2 + t] = 1;
 								sendData(analogInputID[i * 2 + t]);
 								stationAlarm = notResetAlarm;	//alarm cixdi
@@ -879,7 +878,7 @@ int main(void)
 							alarmOnAnalog[i * 2 + t] = 0;
 							analogAlarmCountDown[i * 2 + t] = 10;
 							analogAlarmCount[i * 2 + t] = 0; //alarim deyilse sayicini sifirla
-							secondByte[i * 2 + t] &= ~2;
+							secondByte[i * 2 + t] &= ~1;
 						}
 
 					}
@@ -888,23 +887,20 @@ int main(void)
 
 				if (analogFadeOut[i * 2 + t] == 1)  //fade out dusa
 						{
-					secondByte[i * 2 + t] |= 4;
+					secondByte[i * 2 + t] |= 2;
 				} else {
-					secondByte[i * 2 + t] &= ~4;
+					secondByte[i * 2 + t] &= ~2;
 				}
 
-				if (analogSignalFoult[i * 2 + t] == 1)  //signal foult dusa
-						{
-					secondByte[i * 2 + t] |= 8;
-				} else {
-					secondByte[i * 2 + t] &= ~8;
-				}
+				secondByte[i * 2 + t] |= (int)(63/(analogConfigs[i * 2 + t].maxRealVal)*alarmLevel[i * 2 + t]) << 2;
 
 				secondWord[i * 2 + t] = (uint16_t) secondByte[i * 2 + t]
 						+ ((uint16_t) fractionPart[i * 2 + t]) * 256;
 
 				TxData[i][t * 2] = intPart[i * 2 + t];
 				TxData[i][t * 2 + 1] = secondWord[i * 2 + t];
+
+				secondByte[i * 2 + t] &= 0x03;
 
 				if (i2_j == 2) {
 					i2_j = 2;
@@ -913,6 +909,7 @@ int main(void)
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
 			HAL_Delay(20);
+
 
 		}
 
