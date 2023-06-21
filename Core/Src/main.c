@@ -81,7 +81,7 @@ int datar3;
 float alarmLevelWrite[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
 float alarmLevelRead[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-float alarmLevel[25] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float alarmLevel[25] ;//= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 int i2_t = 0;
 
@@ -144,17 +144,17 @@ void check_channels(int sel) {
 	digitalStates[48 + (3 + tam * 4 - qaliq)] = (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_6)); // Dig5.1-5.16 Dig37-52
 }
 //////////////////////////id deyerleri////////////////////////////////////////////////////////////////////////////////////////////////
-uint16_t id[23] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107, 0x108, 0x109, 0x10A, 0x10B, 0x10C, 0x10D, 0x10E, 0x10F, 0x110, 0x111, 0x150, 0x151, 0x152, 0x153, 0x601, 0x155, 0x156, 0x160};
+uint16_t id[30] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107, 0x108, 0x109, 0x10A, 0x10B, 0x10C, 0x10D, 0x10E, 0x10F, 0x110, 0x111, 0x150, 0x151, 0x152, 0x153, 0x155, 0x156, 0x155, 0x156, 0x157, 0x158, 0x600, 0x161};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CAN_TxHeaderTypeDef TxHeader[25];
+CAN_TxHeaderTypeDef TxHeader[30];
 
 CAN_RxHeaderTypeDef RxHeader;
 
 int datacheck = 0;
 uint8_t pk1 = 0;
 
-uint16_t TxData[25][4];
+uint16_t TxData[30][4];
 
 uint8_t RxData[8];
 
@@ -204,7 +204,7 @@ uint16_t stationAlarm = 0;
 
 uint8_t recivedReset = 0;
 uint8_t alarmLevelRecivedFlag=0;	//bunu qoyuramki alarmLimitLevel yollanildigin qeyd edim ve bunun qebul etdiyimle bagli mesaji geri gonderende buna esasen edim.
-
+uint8_t prencereAcilmaFlag=0;
 uint16_t digitalSum[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 uint16_t intPart[50];
@@ -229,36 +229,17 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 	if (RxHeader.StdId == 0x500) {
 		recivedReset = 1;
 	}
-/*
-	if (RxHeader.StdId == 0x600) {
-		fadeOutReg = 1;
-
-		recivedID = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
-
-		for (int t = 0; t < 77; t++) {
-			if (digitalInputId[t] == recivedID) {
-				fadeOut[t] = RxData[2];
-			}
-
-			if (t < 20) {
-				if (analogInputID[t] == recivedID) {
-					analogFadeOut[t] = RxData[2];
-				}
-			}
-		}
-	}
-*/
 
 	if (RxHeader.StdId == 0x501) {
 		pk1 = RxData[0];
 	}
-	// burda gelen alarmLimitleri qebul et yazdir
+	// burda gelen alarmLimitleri ve fadeout qebul et yazdir
 	if (RxHeader.StdId == 0x600) {
 		fadeOutReg = 1;
 		alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
 		recivedID = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
 		float value = 0;
-		TxData[22][0] = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
+		TxData[29][0] = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
 		for (int k = 0; k < 77; k++) {
 			if (digitalInputId[k] == recivedID) {
 				fadeOut[k] = RxData[2];
@@ -275,6 +256,31 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 			}
 		}
 	}
+
+	if (RxHeader.StdId == 0x650) {
+		recivedID = (int) (RxData[0]) + ((int) (RxData[1]) << 8);
+		prencereAcilmaFlag = 1;
+		for (int k = 0; k < 77; k++) {
+			if (digitalInputId[k] == recivedID) {
+				TxData[26][0] = recivedID;
+				TxData[26][1] = fadeOut[k];
+				TxData[26][2] = 0;
+				TxData[26][3] = 0;
+			}
+		}
+
+		for(int k=0; k<22; k++)
+		{
+			if(analogInputID[k] == recivedID) //deyekki id bunun icindedi
+			{
+				TxData[26][0] = recivedID;
+				TxData[26][1] = analogFadeOut[k];
+				TxData[26][2] = (int)alarmLevel[k];
+				TxData[26][3] = (int)((alarmLevel[k] - (int)alarmLevel[k]) * 100);
+			}
+		}
+	}
+
 }
 
 //float alarmLevel[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
@@ -358,7 +364,7 @@ int main(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 // 14 dene header olacaq
 
-	for (int j = 0; j < 23; j++) {
+	for (int j = 0; j < 30; j++) {
 		TxHeader[j].DLC = 8;
 		TxHeader[j].IDE = CAN_ID_STD;
 		TxHeader[j].RTR = CAN_RTR_DATA;
@@ -419,6 +425,22 @@ int main(void)
 		}
 	}
 
+	for(int k=0;k<22;k++)
+	{
+		if(k>=16)
+		{
+			alarmLevel[k] = EEPROM_Read_NUM(9, 4*k-64);
+		}
+		else
+		{
+			alarmLevel[k] = EEPROM_Read_NUM(8, 4*k);
+		}
+	}
+
+	//bunu loopa salma cunki eeprom un yazma limiti var ve bu 1milyon civaridir eger o limiti kecsen eeprom xarab olur.
+	EEPROM_Write_NUM(0, 0, dataw3);
+	datar3 = EEPROM_Read_NUM(0, 0);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -428,11 +450,14 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-
-		EEPROM_Write_NUM(0, 0, dataw3);
-		datar3 = EEPROM_Read_NUM(0, 0);
 		//EEPROM_Write_NUM(0, 4, dataw3[1]);
 		//datar3[1] = EEPROM_Read_NUM(0, 4);
+
+		if (prencereAcilmaFlag == 1){
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[26], TxData[26], &TxMailbox);
+			HAL_Delay(1);
+			prencereAcilmaFlag = 0;
+		}
 
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1)
@@ -450,7 +475,7 @@ int main(void)
 					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4*k);
 				}
 			}
-			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[22], TxData[22], &TxMailbox);
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[29], TxData[29], &TxMailbox);
 			HAL_Delay(20);
 			alarmLevelRecivedFlag = 0;
 		}
