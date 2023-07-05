@@ -22,6 +22,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <math.h>
+#include "string.h"
 #include "EEPROM.h"
 /* USER CODE END Includes */
 
@@ -159,7 +162,7 @@ uint16_t TxData[30][4];
 uint8_t RxData[8];
 
 uint32_t TxMailbox;
-
+//77 eded digital var
 /*******	config  ***********/
 //uint16_t contactState[77] = 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};			//elcin deyenden sonra edilen duzelis
 uint16_t contactState[77];
@@ -176,7 +179,6 @@ uint8_t fadeOutBaxmaq[77] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 uint16_t fadeOutTot[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
 uint16_t fadeOutTotReadTest[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
 uint16_t fadeOutTotRead[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //
-
 fadeOutReg = 0;
 
 /********************************/
@@ -273,7 +275,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 			if (digitalInputId[k] == recivedID) {
 				prencereAcilmaFlag = 1;
 				TxData[29][0] = recivedID;
-				TxData[29][1] = fadeOut[k];
+				TxData[29][1] = fadeOut[k]  + (contactState[k] << 1);
 				TxData[29][2] = delaySeconds[k];
 				TxData[29][3] = 0;
 			}
@@ -291,7 +293,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 			}
 		}
 	}
-
 }
 
 //float alarmLevel[25] = {70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500, 1500, 1300, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 70};
@@ -391,7 +392,7 @@ int main(void)
 	}
 */
 
-
+/// fade outlari eepromdan oxuma hissesi
 	fadeOutTotRead[0] = EEPROM_Read_NUM(1, 0);
 	fadeOutTotRead[1] = EEPROM_Read_NUM(2, 0);
 	fadeOutTotRead[2] = EEPROM_Read_NUM(3, 0);
@@ -442,7 +443,7 @@ int main(void)
 		contactState[k+16] = (contactStateRead[1] >> k) & 1;
 		contactState[k+32] = (contactStateRead[2] >> k) & 1;
 		contactState[k+48] = (contactStateRead[3] >> k) & 1;
-		if(k<7){
+		if(k<13){
 			contactState[k+64] = (contactStateRead[4] >> k) & 1;
 		}
 	}
@@ -559,7 +560,7 @@ int main(void)
 				contactStateTot[1] |= contactState[t+16]<<t;
 				contactStateTot[2] |= contactState[t+32]<<t;
 				contactStateTot[3] |= contactState[t+48]<<t;
-				if(t<7){
+				if(t<13){
 					contactStateTot[4] |= contactState[t+64]<<t;
 				}
 			}
