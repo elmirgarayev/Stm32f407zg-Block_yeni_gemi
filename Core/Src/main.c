@@ -263,8 +263,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 				alarmLevelRecivedFlag = 1;	//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
 				value = (int)RxData[3] + ((int)RxData[4] << 8) + ((float)RxData[5])/100;
 				analogFadeOut[k] = RxData[2];
-				// burda write qoydumki kohne levellerle islesin
-				alarmLevelWrite[k]=value;
+				alarmLevel[k]=value;
 			}
 		}
 	}
@@ -289,8 +288,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 				prencereAcilmaFlag = 1;
 				TxData[29][0] = recivedID;
 				TxData[29][1] = analogFadeOut[k];
-				TxData[29][2] = (int)alarmLevelWrite[k];
-				TxData[29][3] = (int)((alarmLevelWrite[k] - (int)alarmLevelWrite[k]) * 100);
+				TxData[29][2] = (int)alarmLevel[k];
+				TxData[29][3] = (int)((alarmLevel[k] - (int)alarmLevel[k]) * 100);
 			}
 		}
 	}
@@ -435,8 +434,6 @@ int main(void)
 		}
 	}
 
-	//burani sildim cunki alarmLeveli oxuyur epromdan
-	/*
 	for(int k=0;k<20;k++)
 	{
 		if(k>=16)
@@ -448,7 +445,6 @@ int main(void)
 			alarmLevel[k] = EEPROM_Read_NUM(8, 4*k);
 		}
 	}
-*/
 
 	contactStateRead[0] = EEPROM_Read_NUM(10, 0);
 	contactStateRead[1] = EEPROM_Read_NUM(11, 0);
@@ -843,7 +839,7 @@ int main(void)
 				fractionPart[i2_t] = (uint8_t) ((realVal[i2_t] - intPart[i2_t]) * 100);
 
 				if (analogConfigs[i2_t].moreThen == 0) {
-					if (realVal[i2_t] < alarmLevelWrite[i2_t]) {
+					if (realVal[i2_t] < alarmLevel[i2_t]) {
 						analogAlarmCountDown[i2_t] = 0;
 						if (alarmOnAnalog[i2_t] == 0) {
 							analogAlarmCount[i2_t]++; // analog alarimin say
@@ -866,7 +862,7 @@ int main(void)
 						}
 					}
 				} else if (analogConfigs[i2_t].moreThen == 1) {
-					if (realVal[i2_t] > alarmLevelWrite[i2_t]) {
+					if (realVal[i2_t] > alarmLevel[i2_t]) {
 						analogAlarmCountDown[i2_t] = 0;
 						if (alarmOnAnalog[i2_t] == 0) {
 							analogAlarmCount[i2_t]++; // analog alarimin say
@@ -897,7 +893,7 @@ int main(void)
 					secondByte[i2_t] &= ~2;
 				}
 
-				secondByte[i2_t] |= (int)(63/(analogConfigs[i2_t].maxRealVal)*alarmLevelWrite[i2_t]) << 2;
+				secondByte[i2_t] |= (int)(63/(analogConfigs[i2_t].maxRealVal)*alarmLevel[i2_t]) << 2;
 
 				secondWord[i2_t] = (uint16_t) secondByte[i2_t] + ((uint16_t) fractionPart[i2_t]) * 256;
 
