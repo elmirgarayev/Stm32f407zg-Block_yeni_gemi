@@ -54,7 +54,6 @@ TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
 
-
 uint16_t digitalStates[80];
 
 /* USER CODE END PV */
