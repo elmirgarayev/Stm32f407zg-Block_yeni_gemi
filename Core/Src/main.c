@@ -1328,6 +1328,20 @@ static void MX_GPIO_Init(void) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim6) {
+		for (int h = 0; h < 16; h++) {
+			if (waitingForDelay[h] == 1) {
+				delaySecondsCount[h]++;
+				if (delaySecondsCount[h] >= 255) {
+					delaySecondsCount[h] = 255;
+				}
+			}
+		}
+	}
+}
+
+/*
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if (htim == &htim6) {
 		//
 		for (int h = 0; h < 77; h++) {
 			if (waitingForDelay[h] == 1) {
@@ -1346,7 +1360,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		}
 	}
 }
-
+*/
 /* USER CODE END 4 */
 
 /**
