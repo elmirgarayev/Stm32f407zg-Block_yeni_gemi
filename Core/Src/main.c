@@ -297,8 +297,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 					{
 				fadeOutReg = 1;
 				alarmLevelRecivedFlag = 1;//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
-				value = (int) RxData[3] + ((int) RxData[4] << 8)
-						+ ((float) RxData[5]) / 100;
+				value = (int) RxData[3] + ((int) RxData[4] << 8) + ((float) RxData[5]) / 100;
 				analogFadeOut[k] = RxData[2];
 				alarmLevel[k] = value;
 			}
@@ -523,6 +522,7 @@ int main(void) {
 
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1) {
+			/*
 			for (int k = 0; k < 20; k++) {
 				if (k >= 16) {
 					EEPROM_Write_NUM(9, 4 * k - 64, alarmLevel[k]);
@@ -532,6 +532,17 @@ int main(void) {
 					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4 * k);
 				}
 			}
+			*/
+			for (int k = 0; k < 20; k++) {
+				if (k >= 16) {
+					EEPROM_Write_NUM(9, 4 * k - 64, alarmLevel[k]);
+					alarmLevelRead[k] = EEPROM_Read_NUM(9, 4 * k - 64);
+				} else {
+					EEPROM_Write_NUM(8, 4 * k, alarmLevel[k]);
+					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4 * k);
+				}
+			}
+
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[28], TxData[28], &TxMailbox);
 			HAL_Delay(20);
 			alarmLevelRecivedFlag = 0;
