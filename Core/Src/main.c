@@ -462,12 +462,11 @@ int main(void) {
 	}
 
 	for (int k = 0; k < 20; k++) {
-		if (k >= 16) {
-			alarmLevel[k] = EEPROM_Read_NUM(9, 4 * k - 64);
-		} else {
-			alarmLevel[k] = EEPROM_Read_NUM(8, 4 * k);
-		}
+		alarmLevel[k] = EEPROM_Read_NUM(8+k, k);
 	}
+
+
+
 
 	contactStateRead[0] = EEPROM_Read_NUM(10, 0);
 	contactStateRead[1] = EEPROM_Read_NUM(11, 0);
@@ -522,26 +521,12 @@ int main(void) {
 
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1) {
-			/*
 			for (int k = 0; k < 20; k++) {
-				if (k >= 16) {
-					EEPROM_Write_NUM(9, 4 * k - 64, alarmLevel[k]);
-					alarmLevelRead[k] = EEPROM_Read_NUM(9, 4 * k - 64);
-				} else {
-					EEPROM_Write_NUM(8, 4 * k, alarmLevel[k]);
-					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4 * k);
-				}
+				EEPROM_Write_NUM(8+k, k, alarmLevel[k]);
+				alarmLevelRead[k] = EEPROM_Read_NUM(8+k, k);
 			}
-			*/
-			for (int k = 0; k < 20; k++) {
-				if (k >= 16) {
-					EEPROM_Write_NUM(9, 4 * k - 64, alarmLevel[k]);
-					alarmLevelRead[k] = EEPROM_Read_NUM(9, 4 * k - 64);
-				} else {
-					EEPROM_Write_NUM(8, 4 * k, alarmLevel[k]);
-					alarmLevelRead[k] = EEPROM_Read_NUM(8, 4 * k);
-				}
-			}
+
+
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[28], TxData[28], &TxMailbox);
 			HAL_Delay(20);
