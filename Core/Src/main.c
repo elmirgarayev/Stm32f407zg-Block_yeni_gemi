@@ -345,7 +345,7 @@ struct analogConfig {
 //birinci minimum, ikinci maksimum, ucuncu deyerin necen basladigi, dorduncu necede bitdiyi, bvesinci warning, altinci alarm, 7 cide onun asagi siqnalda yoxsa yuxari siqnalda vermesidi.
 } analogConfigs[25] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
 				{ 0.64, 3.3, 0, 114.296875, 40, 1 },	//1006
-				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1008
+				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1008	//bu hmi da var konopda yox
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1010
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1012 //bosdu bu
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1014
@@ -462,7 +462,7 @@ int main(void) {
 	}
 
 	for (int k = 0; k < 20; k++) {
-		alarmLevel[k] = EEPROM_Read_NUM(8+k, k);
+		alarmLevel[k] = EEPROM_Read_NUM(100+k, 0);
 	}
 
 
@@ -522,8 +522,8 @@ int main(void) {
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1) {
 			for (int k = 0; k < 20; k++) {
-				EEPROM_Write_NUM(8+k, k, alarmLevel[k]);
-				alarmLevelRead[k] = EEPROM_Read_NUM(8+k, k);
+				EEPROM_Write_NUM(100+k, 0, alarmLevel[k]);
+				alarmLevelRead[k] = EEPROM_Read_NUM(100+k, 0);
 			}
 
 
