@@ -144,7 +144,7 @@ void check_channels(int sel) {
 	qaliq = sel % 4;
 
 	digitalStates[48 + (3 + tam * 4 - qaliq)] = (HAL_GPIO_ReadPin(GPIOA,
-			GPIO_PIN_6)); // Dig5.1-5.16 Dig37-52
+	GPIO_PIN_6)); // Dig5.1-5.16 Dig37-52
 }
 //////////////////////////id deyerleri////////////////////////////////////////////////////////////////////////////////////////////////
 uint16_t id[30] = { 0x100, 0x101, 0x102, 0x103, 0x104, 0x105, 0x106, 0x107,
@@ -247,7 +247,7 @@ uint16_t analogFadeOutTotRead[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 uint16_t stationAlarm = 0;
 
 uint8_t recivedReset = 0;
-uint8_t alarmLevelRecivedFlag = 0;//bunu qoyuramki alarmLimitLevel yollanildigin qeyd edim ve bunun qebul etdiyimle bagli mesaji geri gonderende buna esasen edim.
+uint8_t alarmLevelRecivedFlag = 0; //bunu qoyuramki alarmLimitLevel yollanildigin qeyd edim ve bunun qebul etdiyimle bagli mesaji geri gonderende buna esasen edim.
 uint8_t prencereAcilmaFlag = 0;
 uint16_t digitalSum[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -285,7 +285,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 		for (int k = 0; k < 77; k++) {
 			if (digitalInputId[k] == recivedID) {
 				fadeOutReg = 1;
-				alarmLevelRecivedFlag = 1;//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
+				alarmLevelRecivedFlag = 1; //qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
 				fadeOut[k] = RxData[2] & 0x01;
 				contactState[k] = (RxData[2] >> 1) & 0x01;
 				delaySeconds[k] = (int) RxData[3] + ((int) RxData[4] << 8);
@@ -296,8 +296,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 			if (analogInputID[k] == recivedID) //deyekki id bunun icindedi
 					{
 				fadeOutReg = 1;
-				alarmLevelRecivedFlag = 1;//qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
-				value = (int) RxData[3] + ((int) RxData[4] << 8) + ((float) RxData[5]) / 100;
+				alarmLevelRecivedFlag = 1; //qebul etdiyimizi qey edirik. geri xeber etdiyimizde sifirla.
+				value = (int) RxData[3] + ((int) RxData[4] << 8)
+						+ ((float) RxData[5]) / 100;
 				analogFadeOut[k] = RxData[2];
 				alarmLevel[k] = value;
 			}
@@ -345,7 +346,7 @@ struct analogConfig {
 //birinci minimum, ikinci maksimum, ucuncu deyerin necen basladigi, dorduncu necede bitdiyi, bvesinci warning, altinci alarm, 7 cide onun asagi siqnalda yoxsa yuxari siqnalda vermesidi.
 } analogConfigs[25] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
 				{ 0.64, 3.3, 0, 114.296875, 40, 1 },	//1006
-				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1008	//bu hmi da var konopda yox
+				{ 0.64, 3.3, 0, 114.296875, 60, 1 },//1008	//bu hmi da var konopda yox
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1010
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1012 //bosdu bu
 				{ 0.64, 3.3, 0, 114.296875, 60, 1 },	//1014
@@ -462,11 +463,8 @@ int main(void) {
 	}
 
 	for (int k = 0; k < 20; k++) {
-		alarmLevel[k] = EEPROM_Read_NUM(100+k, 0);
+		alarmLevel[k] = EEPROM_Read_NUM(100 + k, 0);
 	}
-
-
-
 
 	contactStateRead[0] = EEPROM_Read_NUM(10, 0);
 	contactStateRead[1] = EEPROM_Read_NUM(11, 0);
@@ -522,11 +520,9 @@ int main(void) {
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1) {
 			for (int k = 0; k < 20; k++) {
-				EEPROM_Write_NUM(100+k, 0, alarmLevel[k]);
-				alarmLevelRead[k] = EEPROM_Read_NUM(100+k, 0);
+				EEPROM_Write_NUM(100 + k, 0, alarmLevel[k]);
+				alarmLevelRead[k] = EEPROM_Read_NUM(100 + k, 0);
 			}
-
-
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[28], TxData[28], &TxMailbox);
 			HAL_Delay(20);
@@ -752,7 +748,7 @@ int main(void) {
 							}
 						} else {
 							alarmCount[k]++;//n defe alarm cixidigin yoxlayan sayici
-							if (alarmCount[k] > 4) {		//4 defe cixdisa gir
+							if (alarmCount[k] > 2) {		//4 defe cixdisa gir
 								if ((delaySeconds[k] == 0)
 										&& (fadeOut[k] == 0)) {	//saniye sayan 0 disa gir
 									alarmOn[k] = 1;				//alari yandir
@@ -1232,8 +1228,8 @@ static void MX_GPIO_Init(void) {
 	 D2_7_Pin D2_11_Pin D1_12_Pin D1_9_Pin
 	 D2_3_Pin D2_16_Pin */
 	GPIO_InitStruct.Pin =
-			D2_9_Pin | D2_10_Pin | D1_11_Pin | D2_12_Pin | D2_7_Pin | D2_11_Pin
-					| D1_12_Pin | D1_9_Pin | D2_3_Pin | D2_16_Pin;
+	D2_9_Pin | D2_10_Pin | D1_11_Pin | D2_12_Pin | D2_7_Pin | D2_11_Pin
+			| D1_12_Pin | D1_9_Pin | D2_3_Pin | D2_16_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
@@ -1249,7 +1245,7 @@ static void MX_GPIO_Init(void) {
 	/*Configure GPIO pins : D2_5_Pin PF6 D1_8_Pin D1_5_Pin
 	 D1_6_Pin */
 	GPIO_InitStruct.Pin =
-			D2_5_Pin | GPIO_PIN_6 | D1_8_Pin | D1_5_Pin | D1_6_Pin;
+	D2_5_Pin | GPIO_PIN_6 | D1_8_Pin | D1_5_Pin | D1_6_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
@@ -1324,39 +1320,42 @@ static void MX_GPIO_Init(void) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim6) {
-		for (int h = 0; h < 16; h++) {
+		for (int h = 0; h < 77; h++) {
 			if (waitingForDelay[h] == 1) {
 				delaySecondsCount[h]++;
 				if (delaySecondsCount[h] >= 255) {
 					delaySecondsCount[h] = 255;
 				}
 			}
-		}
-	}
-}
-
-/*
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim == &htim6) {
-		//
-		for (int h = 0; h < 77; h++) {
-			if (waitingForDelay[h] == 1) {
-				delaySecondsCount[h]++;
-				if (delaySecondsCount[h] >= 50) {
-					delaySecondsCount[h] = 50;
-				}
-			}
-		}
-		//HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_13);
-
-		for (int h = 0; h < 77; h++) {
 			if (delaySecondsCountForOff[h] > 0) {
 				delaySecondsCountForOff[h] -= 1;
 			}
 		}
 	}
 }
-*/
+
+/*
+ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+ if (htim == &htim6) {
+ //
+ for (int h = 0; h < 77; h++) {
+ if (waitingForDelay[h] == 1) {
+ delaySecondsCount[h]++;
+ if (delaySecondsCount[h] >= 50) {
+ delaySecondsCount[h] = 50;
+ }
+ }
+ }
+ //HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_13);
+
+ for (int h = 0; h < 77; h++) {
+ if (delaySecondsCountForOff[h] > 0) {
+ delaySecondsCountForOff[h] -= 1;
+ }
+ }
+ }
+ }
+ */
 /* USER CODE END 4 */
 
 /**
