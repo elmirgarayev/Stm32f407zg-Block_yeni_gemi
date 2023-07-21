@@ -2667,7 +2667,7 @@ Disassembly of section .text:
  8001f56:	4288      	cmp	r0, r1
  8001f58:	d814      	bhi.n	8001f84 <main+0xe84>
  8001f5a:	b99c      	cbnz	r4, 8001f84 <main+0xe84>
- 8001f5c:	2105      	movs	r1, #5
+ 8001f5c:	2110      	movs	r1, #16
  8001f5e:	f8bb 0000 	ldrh.w	r0, [fp]
  8001f62:	8032      	strh	r2, [r6, #0]
  8001f64:	f8a9 1000 	strh.w	r1, [r9]
@@ -3047,7 +3047,7 @@ Disassembly of section .text:
  80023b2:	2201      	movs	r2, #1
  80023b4:	b9b1      	cbnz	r1, 80023e4 <main+0x12e4>
  80023b6:	b9ac      	cbnz	r4, 80023e4 <main+0x12e4>
- 80023b8:	2105      	movs	r1, #5
+ 80023b8:	2110      	movs	r1, #16
  80023ba:	f8bb 0000 	ldrh.w	r0, [fp]
  80023be:	8032      	strh	r2, [r6, #0]
  80023c0:	f8a9 1000 	strh.w	r1, [r9]
