@@ -82,10 +82,9 @@ int dataw3 = 17;
 int datar3;
 float alarmLevelWrite[25] = { 70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500,
 		1500, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70 };
-float alarmLevelRead[25] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0 };
+float alarmLevelRead[25];
 
-float alarmLevel[25]; //= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+float alarmLevel[25];
 
 int i2_t = 0;
 
@@ -319,8 +318,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 		}
 
 		for (int k = 0; k < 20; k++) {
-			if (analogInputID[k] == recivedID) //deyekki id bunun icindedi
-					{
+			if (analogInputID[k] == recivedID){ //deyekki id bunun icindedi
 				prencereAcilmaFlag = 1;
 				TxData[29][0] = recivedID;
 				TxData[29][1] = analogFadeOut[k];
@@ -486,7 +484,6 @@ int main(void) {
 	// delay secondsu eepromdan oxuma
 	for (int t = 0; t < 10; t++) {
 		for (int k = 0; k < 4; k++) {
-
 			delaySecondsTotRead[t * 4 + k] = EEPROM_Read_NUM(20 + t, 16 * k);
 
 			delaySeconds[8 * t + k * 2] = (delaySecondsTotRead[t * 4 + k])
@@ -787,7 +784,6 @@ int main(void) {
 			stationAlarm = resetAlarm;						//alarmi reset et
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13, GPIO_PIN_RESET);//ve sondur alarmi
 			recivedReset = 0;				//compyuterden gelen reseti sifirla
-			say = 10;
 		}
 
 		TxData[16][0] = stationAlarm;
@@ -795,17 +791,6 @@ int main(void) {
 		TxData[16][2] = stationAlarm;
 		TxData[16][3] = stationAlarm;
 
-		if (say != 0) {
-			TxData[16][1] = 3;
-			say--;
-			for (int hh = 0; hh < 10; hh++) {
-				HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16],
-						&TxMailbox);
-				HAL_Delay(20);
-			}
-		} else {
-			TxData[16][1] = 0;
-		}
 
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16], &TxMailbox);
 		HAL_Delay(20);
