@@ -1,8 +1,8 @@
-main.c:428:7:sendData	8	static
+main.c:435:7:sendData	8	static
 main.c:102:6:mux	8	static
 main.c:114:6:check_channels	32	static
-main.c:264:6:HAL_CAN_RxFifo0MsgPendingCallback	48	static
-main.c:935:6:SystemClock_Config	88	static,ignoring_inline_asm
-main.c:376:5:main	136	static,ignoring_inline_asm
-main.c:1325:6:HAL_TIM_PeriodElapsedCallback	12	static
-main.c:1369:6:Error_Handler	0	static,ignoring_inline_asm
+main.c:264:6:HAL_CAN_RxFifo0MsgPendingCallback	56	static
+main.c:960:6:SystemClock_Config	88	static,ignoring_inline_asm
+main.c:383:5:main	136	static,ignoring_inline_asm
+main.c:1350:6:HAL_TIM_PeriodElapsedCallback	12	static
+main.c:1394:6:Error_Handler	0	static,ignoring_inline_asm
