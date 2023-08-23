@@ -434,8 +434,8 @@ int main(void)
 
 	void sendData(uint16_t inputId)						//
 	{
-		TxData[14][0] = inputId;
-		TxData[14][1] =	inputId >> 8;
+		TxData[14][0] = (uint8_t)inputId;
+		TxData[14][1] =	(uint8_t)(inputId >> 8);
 		TxData[14][2] = 0;
 		TxData[14][3] = 0;
 		TxData[14][4] = 0;
