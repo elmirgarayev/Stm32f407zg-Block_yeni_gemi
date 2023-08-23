@@ -432,12 +432,16 @@ int main(void)
 	 }
 	 */
 
-	void sendData(int inputId)						//
+	void sendData(uint16_t inputId)						//
 	{
-		TxData[14][0] = inputId;  ////giris nomresi
-		//TxData[14][1]=(uint16_t)seconds;
-		TxData[14][2] = 1;  /////////stansiya nomresi
-		//TxData[14][3] = 1065;
+		TxData[14][0] = inputId;
+		TxData[14][1] =	inputId >> 8;
+		TxData[14][2] = 0;
+		TxData[14][3] = 0;
+		TxData[14][4] = 0;
+		TxData[14][5] = 0;
+		TxData[14][6] = 0;
+		TxData[14][7] = 0;
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[14], TxData[14], &TxMailbox);
 		HAL_Delay(20);
 	}
