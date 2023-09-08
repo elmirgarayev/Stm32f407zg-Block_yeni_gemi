@@ -261,6 +261,15 @@ float voltVal[50];
 
 int recivedID = 0;
 
+/*
+uint16_t buffer[100];
+uint16_t bufferCounter=0;
+
+void push(uint16_t buffer[], uint16_t value){
+
+}
+*/
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1) {
 
 	HAL_CAN_GetRxMessage(hcan1, CAN_RX_FIFO0, &RxHeader, RxData);
@@ -750,6 +759,7 @@ int main(void)
 								alarmOn[k] = 1;                  //alarmi yandir
 								delaySecondsCountForOff[k] = 40; //alarmi sonudrmek ucun olan sayicini 5 ele
 								sendData(digitalInputId[k]);				//
+								//buffer
 								stationAlarm = notResetAlarm;//alarimi yandir signal cixdi deye
 								HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13,
 										GPIO_PIN_SET);	//alarim isigin yandir
