@@ -88,6 +88,10 @@ float alarmLevel[25];
 
 int i2_t = 0;
 
+int delayTime = 5;
+
+int sendCountCheck[40];
+
 uint16_t message[62];
 uint16_t analog[62];
 
@@ -543,7 +547,7 @@ int main(void)
 			}
 
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[28], TxData[28], &TxMailbox);
-			HAL_Delay(20);
+			HAL_Delay(delayTime);
 			alarmLevelRecivedFlag = 0;
 		}
 
@@ -813,9 +817,14 @@ int main(void)
 		TxData[16][2] = stationAlarm;
 		TxData[16][3] = stationAlarm;
 
-
-		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16], &TxMailbox);
-		HAL_Delay(20);
+		if(sendCountCheck[20] >= 10){
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[16], TxData[16], &TxMailbox);
+			HAL_Delay(delayTime);
+			sendCountCheck[20] = 0;
+		}
+		else{
+			sendCountCheck[20]++;
+		}
 
 		TxData[11][0] = digitalSum[0];
 		TxData[11][1] = digitalSum[0] >> 8;
@@ -844,12 +853,33 @@ int main(void)
 		TxData[13][6] = 0;
 		TxData[13][7] = 0;
 
-		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[11], TxData[11], &TxMailbox);
-		HAL_Delay(20);
-		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[12], TxData[12], &TxMailbox);
-		HAL_Delay(20);
-		HAL_CAN_AddTxMessage(&hcan1, &TxHeader[13], TxData[13], &TxMailbox);
-		HAL_Delay(20);
+
+		if(sendCountCheck[21] >= 10){
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[11], TxData[11], &TxMailbox);
+			HAL_Delay(delayTime);
+			sendCountCheck[21] = 0;
+		}
+		else{
+			sendCountCheck[21]++;
+		}
+
+		if(sendCountCheck[22] >= 10){
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[12], TxData[12], &TxMailbox);
+			HAL_Delay(delayTime);
+			sendCountCheck[22] = 0;
+		}
+		else{
+			sendCountCheck[22]++;
+		}
+
+		if(sendCountCheck[23] >= 10){
+			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[13], TxData[13], &TxMailbox);
+			HAL_Delay(delayTime);
+			sendCountCheck[23] = 0;
+		}
+		else{
+			sendCountCheck[23]++;
+		}
 
 		digitalSum[0] = 0;
 		digitalSum[1] = 0;
@@ -947,21 +977,26 @@ int main(void)
 				TxData[i][t * 4 + 2] = secondWord[i2_t];
 				TxData[i][t * 4 + 3] = secondWord[i2_t] >> 8;
 
-
-
 				secondByte[i2_t] &= 0x03;
 
 			}
 
-			HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
-			HAL_Delay(20);
+
+			if(sendCountCheck[i] >= 10){
+				HAL_CAN_AddTxMessage(&hcan1, &TxHeader[i], TxData[i], &TxMailbox);
+				HAL_Delay(delayTime);
+				sendCountCheck[i] = 0;
+			}
+			else{
+				sendCountCheck[i]++;
+			}
 
 		}
 
 		/*
 		 //bu neyi yollayir bilmedim arasdir
 		 HAL_CAN_AddTxMessage(&hcan1, &TxHeader[12], TxData[12], &TxMailbox);
-		 HAL_Delay(20);
+		 HAL_Delay(delayTime);
 		 */
 	}
   /* USER CODE END 3 */
