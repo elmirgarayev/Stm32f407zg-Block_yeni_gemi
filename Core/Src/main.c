@@ -86,6 +86,8 @@ float alarmLevelRead[25];
 
 float alarmLevel[25];
 
+float smoothedValue[62];
+
 int i2_t = 0;
 
 int otherSignals[4] = {0, 0, 0, 0};
@@ -119,29 +121,41 @@ void mux(int sel) {
  * muxdaki adc ve dig leri oxu
  */
 void check_channels(int sel) {
-	int sampleRate = 100;
+	//int sampleRate = 100;
+	float labda=0.96;
 
 	HAL_ADC_Start(&hadc3);
 	HAL_ADC_PollForConversion(&hadc3, 1000);
-	float sum = 0, average = 0;
+	//float sum = 0, average = 0;
+	float newValue=0;
+	/*
 	for (int t = 0; t < sampleRate; t++) {
 		sum = sum + HAL_ADC_GetValue(&hadc3);
 	}
 	average = sum / sampleRate;
-	message[sel] = average;
-	sum = 0;
-	average = 0;
+	*/
+	newValue = HAL_ADC_GetValue(&hadc3);
+	smoothedValue[sel] = newValue*(1-labda) + smoothedValue[sel]*labda;
+	//message[sel] = average;
+	message[sel] = smoothedValue[sel];
+	//sum = 0;
+	//average = 0;
 	HAL_ADC_Stop(&hadc3);
 //
 	HAL_ADC_Start(&hadc2);
 	HAL_ADC_PollForConversion(&hadc2, 1000);
+	/*
 	for (int t = 0; t < sampleRate; t++) {
 		sum = sum + HAL_ADC_GetValue(&hadc2);
 	}
 	average = sum / sampleRate;
 	message[sel + 16] = average;
-	sum = 0;
-	average = 0;
+	*/
+	newValue = HAL_ADC_GetValue(&hadc2);
+	smoothedValue[sel + 16] = newValue*(1-labda) + smoothedValue[sel + 16]*labda;
+	message[sel+16] = smoothedValue[sel+16];
+	//sum = 0;
+	//average = 0;
 	HAL_ADC_Stop(&hadc2);
 
 	int tam = 0, qaliq = 0;
@@ -911,15 +925,9 @@ int main(void)
 				i2_t = i * 2 + t;
 
 				voltVal[i2_t] = (((float) analog[i2_t]) * 3.3) / 4096.0;
-				realVal[i2_t] = ((voltVal[i2_t] - analogConfigs[i2_t].minVolt)
-						/ (analogConfigs[i2_t].maxVolt
-								- analogConfigs[i2_t].minVolt))
-						* (analogConfigs[i2_t].maxRealVal
-								- analogConfigs[i2_t].minRealVal); //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin
+				realVal[i2_t] = ((voltVal[i2_t] - analogConfigs[i2_t].minVolt) / (analogConfigs[i2_t].maxVolt - analogConfigs[i2_t].minVolt)) * (analogConfigs[i2_t].maxRealVal - analogConfigs[i2_t].minRealVal); //olculen vahide gore hesablanan deyer yeni tempdise tempratur qarsiligi voltajin
 				intPart[i2_t] = (uint16_t) realVal[i2_t];
-				fractionPart[i2_t] = (uint8_t) ((realVal[i2_t] - intPart[i2_t])
-						* 100);
-
+				fractionPart[i2_t] = (uint8_t)((realVal[i2_t] - intPart[i2_t]) * 100);
 				if (analogConfigs[i2_t].moreThen == 0) {
 					if (realVal[i2_t] < alarmLevel[i2_t]) {
 						analogAlarmCountDown[i2_t] = 0;
@@ -978,11 +986,9 @@ int main(void)
 					secondByte[i2_t] &= ~2;
 				}
 
-				secondByte[i2_t] |= (int) (63 / (analogConfigs[i2_t].maxRealVal)
-						* alarmLevel[i2_t]) << 2;
+				secondByte[i2_t] |= (int) (63 / (analogConfigs[i2_t].maxRealVal) * alarmLevel[i2_t]) << 2;
 
-				secondWord[i2_t] = (uint16_t) secondByte[i2_t]
-						+ ((uint16_t) fractionPart[i2_t]) * 256;
+				secondWord[i2_t] = (uint16_t) secondByte[i2_t] + ((uint16_t) fractionPart[i2_t]) * 256;
 
 				TxData[i][t * 4] = intPart[i2_t];
 				TxData[i][t * 4 + 1] = intPart[i2_t] >> 8;
@@ -1208,7 +1214,7 @@ static void MX_CAN1_Init(void)
   hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
   hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
+  hcan1.Init.AutoBusOff = ENABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
   hcan1.Init.AutoRetransmission = DISABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
