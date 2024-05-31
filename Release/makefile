@@ -35,34 +35,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Stm32f407zg-Block1
+BUILD_ARTIFACT_NAME := Stm32f407zg-Block_yeni_gemi
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Stm32f407zg-Block1.elf \
+Stm32f407zg-Block_yeni_gemi.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Stm32f407zg-Block1.list \
+Stm32f407zg-Block_yeni_gemi.list \
 
 OBJCOPY_BIN += \
-Stm32f407zg-Block1.bin \
+Stm32f407zg-Block_yeni_gemi.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Stm32f407zg-Block1.elf secondary-outputs
+main-build: Stm32f407zg-Block_yeni_gemi.elf secondary-outputs
 
 # Tool invocations
-Stm32f407zg-Block1.elf: $(OBJS) $(USER_OBJS) C:\Users\elmir\STM32CubeIDE\workspace_1.7.0\Stm32f407zg-Block1\STM32F407ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Stm32f407zg-Block1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\elmir\STM32CubeIDE\workspace_1.7.0\Stm32f407zg-Block1\STM32F407ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Stm32f407zg-Block1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Stm32f407zg-Block_yeni_gemi.elf: $(OBJS) $(USER_OBJS) C:\Users\elmir\STM32CubeIDE\workspace_1.7.0\Stm32f407zg-Block_yeni_gemi\STM32F407ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Stm32f407zg-Block_yeni_gemi.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\elmir\STM32CubeIDE\workspace_1.7.0\Stm32f407zg-Block_yeni_gemi\STM32F407ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Stm32f407zg-Block_yeni_gemi.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,19 +71,19 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Stm32f407zg-Block1.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Stm32f407zg-Block1.list"
+Stm32f407zg-Block_yeni_gemi.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Stm32f407zg-Block_yeni_gemi.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Stm32f407zg-Block1.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Stm32f407zg-Block1.bin"
+Stm32f407zg-Block_yeni_gemi.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Stm32f407zg-Block_yeni_gemi.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(SIZE_OUTPUT)$(OBJDUMP_LIST)$(EXECUTABLES)$(OBJS)$(S_DEPS)$(S_UPPER_DEPS)$(C_DEPS)$(OBJCOPY_BIN) Stm32f407zg-Block1.elf
+	-$(RM) $(SIZE_OUTPUT)$(OBJDUMP_LIST)$(EXECUTABLES)$(OBJS)$(S_DEPS)$(S_UPPER_DEPS)$(C_DEPS)$(OBJCOPY_BIN) Stm32f407zg-Block_yeni_gemi.elf
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)

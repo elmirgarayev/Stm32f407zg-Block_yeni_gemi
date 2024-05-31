@@ -76,8 +76,6 @@ void Error_Handler(void);
 #define D1_3_GPIO_Port GPIOA
 #define D1_2_Pin GPIO_PIN_5
 #define D1_2_GPIO_Port GPIOA
-#define D5__Pin GPIO_PIN_6
-#define D5__GPIO_Port GPIOA
 #define D1_1_Pin GPIO_PIN_7
 #define D1_1_GPIO_Port GPIOA
 #define ALARM30_Pin GPIO_PIN_5
