@@ -252,6 +252,8 @@ uint16_t analogFadeOutTotRead[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 uint16_t stationAlarm = 0;
 
+int pushGranted=0;
+
 uint8_t recivedReset = 0;
 uint8_t alarmLevelRecivedFlag = 0; //bunu qoyuramki alarmLimitLevel yollanildigin qeyd edim ve bunun qebul etdiyimle bagli mesaji geri gonderende buna esasen edim.
 uint8_t prencereAcilmaFlag = 0;
@@ -792,11 +794,19 @@ int main(void)
 		}
 
 
+		if(HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_6) == 1){
+			HAL_Delay(20);
+			if(HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_6) == 1){
+				pushGranted=1;
+			}
+		}
 
-		if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_6) == 1 || recivedReset == 1) { //reset basdiq veya conpuyuterden reset geldi
+
+		if (pushGranted == 1 || recivedReset == 1) { //reset basdiq veya conpuyuterden reset geldi
 			stationAlarm = resetAlarm;						//alarmi reset et
 			HAL_GPIO_WritePin(GPIOF, GPIO_PIN_13, GPIO_PIN_RESET);//ve sondur alarmi
 			recivedReset = 0;				//compyuterden gelen reseti sifirla
+			pushGranted=0;
 		}
 
 
