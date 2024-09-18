@@ -80,13 +80,16 @@ static void MX_ADC1_Init(void);
 //epromun islekliyin yoxlamq ucun
 //int dataw3[2] = {1, 2};
 //int datar3[2] = {0, 0};
+
+float labda=0.96;
+
 int dataw3 = 17;
 int datar3;
 float alarmLevelWrite[34] = { 70, 98, 80, 1500, 90, 85, 0.3, 2, 1500, 1500,
 		1500, 0.5, 0.1, 1500, 1500, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70, 0.7, 3, 0.6, 1, 490, 50, 70, 70, 70 };
 float alarmLevelRead[34];
 
-float alarmLevel[34];
+float alarmLevel[36];
 
 float smoothedValue[62];
 
@@ -122,9 +125,72 @@ void mux(int sel) {
 /*
  * muxdaki adc ve dig leri oxu
  */
+
+void ADC_Select_CH1(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_11;
+	  sConfig.Rank = 1;
+	  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CH2(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_12;
+	  sConfig.Rank = 1;
+	  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CH3(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_13;
+	  sConfig.Rank = 1;
+	  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CH4(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_10;
+	  sConfig.Rank = 1;
+	  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
+void ADC_Select_CH(void){
+	  ADC_ChannelConfTypeDef sConfig = {0};
+	  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	  */
+	  sConfig.Channel = ADC_CHANNEL_7;
+	  sConfig.Rank = 1;
+	  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+}
+
 void check_channels(int sel) {
 
-	float labda=0.96;
+
+
+	ADC_Select_CH();
 
 	HAL_ADC_Start(&hadc3);
 	HAL_ADC_PollForConversion(&hadc3, 1000);
@@ -172,7 +238,7 @@ uint32_t TxMailbox;
 //77 eded digital var
 /*******	config  ***********/
 //uint16_t contactState[77] = 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};			//elcin deyenden sonra edilen duzelis
-uint16_t contactState[32];
+uint16_t contactState[36];
 uint16_t contactStateTot[5] = { 0, 0, 0, 0, 0 };
 uint16_t contactStateRead[5] = { 0, 0, 0, 0, 0 };
 uint16_t contactStateTest[81];
@@ -216,7 +282,7 @@ uint16_t alarmOn[81] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-uint16_t alarmOnAnalog[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint16_t alarmOnAnalog[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 uint16_t alarmCount[81] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -228,22 +294,22 @@ uint16_t waitingForDelay[81] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // delay ucun gozleme registeri
 
-uint16_t analogInputID[34] = { 1006, 1008, 1010, 1012, 1014, 1016, 1018,
+uint16_t analogInputID[36] = { 1006, 1008, 1010, 1012, 1014, 1016, 1018,
 		1020, 1022, 1024, 1026, 1028, 1030, 1032, 1033, 1034, 1035, 1036, 1037,
 		1038, 1039, 1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049,
-		1050, 1051, 1052 }; // analog ID
+		1050, 1051, 1052, 1002, 1004 }; // analog ID
 
-uint8_t secondByte[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint8_t secondByte[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0 };
 
-uint16_t analogAlarmCount[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint16_t analogAlarmCount[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0 }; // analog alarm sayicilarin tutmaq ucun
-uint16_t analogAlarmCountDown[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint16_t analogAlarmCountDown[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0 }; // analog alarm sayicilarin tutmaq ucun
 
-uint8_t analogFadeOut[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint8_t analogFadeOut[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0 }; // analog fade outlari tutmaq ucun
-uint8_t analogFadeOutBaxmaq[34] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+uint8_t analogFadeOutBaxmaq[36] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0 }; // analog fade outlari tutmaq ucun
 
 uint16_t analogFadeOutTot[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -374,7 +440,7 @@ struct analogConfig {
 
 //hecne baglanmayanlara 1500 limit qoy ve boyukdur deki yalanci alarm yaratmasin
 //birinci minimum, ikinci maksimum, ucuncu deyerin necen basladigi, dorduncu necede bitdiyi, bvesinci warning, altinci alarm, 7 cide onun asagi siqnalda yoxsa yuxari siqnalda vermesidi.
-} analogConfigs[34] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
+} analogConfigs[36] = { ///3.2 eger 110 olarsa 3.3 de 114.296875 olar
 				{ 0.64, 3.3, 0, 114, 60, 1 },		//1006
 				{ 0.64, 3.3, 0, 114, 60, 1 },		//1008
 				{ 0.64, 3.3, 0, 114, 60, 1 },		//1010
@@ -408,7 +474,15 @@ struct analogConfig {
 				{ 0.64, 3.2, 0, 6, 60, 0 },			//1049
 				{ 0.64, 3.2, 0, 6, 60, 0 },			//1050
 				{ 0.64, 3.2, 0, 40, 60, 0 },		//1051
-				{ 0.64, 3.2, 0, 6, 60, 0 } };		//1052
+				{ 0.64, 3.2, 0, 6, 60, 0 },			//1052
+				{ 0.64, 3.3, 0, 114, 60, 1 },		//1002
+				{ 0.64, 3.3, 0, 114, 60, 1 } };		//1004
+
+
+
+
+
+
 
 /* USER CODE END 0 */
 
@@ -502,12 +576,12 @@ int main(void)
 
 		analogFadeOut[k] = (analogFadeOutTotRead[0] >> k) & 1;
 		analogFadeOut[k + 16] = (analogFadeOutTotRead[1] >> k) & 1;
-		if (k < 2) {
+		if (k < 4) {
 			analogFadeOut[k + 32] = (analogFadeOutTotRead[2] >> k) & 1;
 		}
 	}
 
-	for (int k = 0; k < 34; k++) {				//34 dene analogun fade outlarin oxu
+	for (int k = 0; k < 36; k++) {				//36 dene analogun fade outlarin oxu
 		alarmLevel[k] = EEPROM_Read_NUM(100 + k, 0);
 	}
 
@@ -525,10 +599,8 @@ int main(void)
 		for (int k = 0; k < 4; k++) {
 			delaySecondsTotRead[t * 4 + k] = EEPROM_Read_NUM(20 + t, 16 * k);
 
-			delaySeconds[8 * t + k * 2] = (delaySecondsTotRead[t * 4 + k])
-					& 0xff;
-			delaySeconds[8 * t + k * 2 + 1] = (delaySecondsTotRead[t * 4 + k]
-					>> 8) & 0xff;
+			delaySeconds[8 * t + k * 2] = (delaySecondsTotRead[t * 4 + k]) & 0xff;
+			delaySeconds[8 * t + k * 2 + 1] = (delaySecondsTotRead[t * 4 + k] >> 8) & 0xff;
 		}
 	}
 
@@ -555,7 +627,7 @@ int main(void)
 
 		// bu hissede eger alarm level deyisibse yollayirq
 		if (alarmLevelRecivedFlag == 1) {
-			for (int k = 0; k < 34; k++) {
+			for (int k = 0; k < 36; k++) {
 				EEPROM_Write_NUM(100 + k, 0, alarmLevel[k]);
 				alarmLevelRead[k] = EEPROM_Read_NUM(100 + k, 0);
 			}
@@ -636,7 +708,7 @@ int main(void)
 			analogFadeOutBaxmaq[k] = (analogFadeOutTotReadTest[0] >> k) & 1;
 			analogFadeOutBaxmaq[k + 16] = (analogFadeOutTotReadTest[1] >> k);
 
-			if (k < 2) {
+			if (k < 4) {
 				analogFadeOutBaxmaq[k + 32] = (analogFadeOutTotReadTest[2] >> k) & 1;
 			}
 		}
@@ -647,6 +719,30 @@ int main(void)
 			HAL_Delay(1);
 			check_channels(t);
 		}
+
+
+		float newValue1=0;
+
+		ADC_Select_CH2();
+
+		HAL_ADC_Start(&hadc3);
+		HAL_ADC_PollForConversion(&hadc3, 1000);
+		newValue1=0;
+		newValue1 = HAL_ADC_GetValue(&hadc3);
+		smoothedValue[60] = newValue1*(1-labda) + smoothedValue[60]*labda;
+		message[60] = smoothedValue[60];
+		HAL_ADC_Stop(&hadc3);
+
+		ADC_Select_CH4();
+
+		HAL_ADC_Start(&hadc3);
+		HAL_ADC_PollForConversion(&hadc3, 1000);
+		newValue1=0;
+		newValue1 = HAL_ADC_GetValue(&hadc3);
+		smoothedValue[61] = newValue1*(1-labda) + smoothedValue[61]*labda;
+		message[61] = smoothedValue[61];
+		HAL_ADC_Stop(&hadc3);
+
 		int m = 0;
 		for (int t = 0; t < 48; t++) {
 			if ((t != 0) && (t != 2) && (t != 4) && (t != 6) && (t != 8)
@@ -1172,13 +1268,13 @@ static void MX_ADC3_Init(void)
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_7;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
+//  sConfig.Channel = ADC_CHANNEL_7;
+//  sConfig.Rank = 1;
+//  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+//  if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
+//  {
+//    Error_Handler();
+//  }
   /* USER CODE BEGIN ADC3_Init 2 */
 
   /* USER CODE END ADC3_Init 2 */
